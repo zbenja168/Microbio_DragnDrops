@@ -247,6 +247,13 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .items-grid.drag-over {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 0.5rem;
         }
 
         .draggable-item {
@@ -419,6 +426,17 @@
             line-height: 1.4;
             border: 2px solid var(--border);
             animation: fadeIn 0.3s ease;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .item-in-zone:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-in-zone.dragging {
+            opacity: 0.5;
         }
 
         @media (max-width: 1400px) {
@@ -651,6 +669,11 @@
             const container = document.getElementById('items-grid');
             container.innerHTML = '';
 
+            // Add drop listeners to word bank
+            container.addEventListener('dragover', handleDragOver);
+            container.addEventListener('dragleave', handleDragLeave);
+            container.addEventListener('drop', handleDrop);
+
             const allItems = [];
             
             // Collect all answers and shuffle
@@ -687,10 +710,15 @@
         function handleDragStart(e) {
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', e.target.innerHTML);
+            e.dataTransfer.setData('text/html', e.target.textContent);
             e.dataTransfer.setData('category', e.target.dataset.category);
             e.dataTransfer.setData('drugClass', e.target.dataset.drugClass);
-            e.dataTransfer.setData('itemId', e.target.dataset.id);
+            e.dataTransfer.setData('itemId', e.target.dataset.id || e.target.dataset.itemId);
+            
+            // Track if coming from a zone
+            if (e.target.classList.contains('item-in-zone')) {
+                e.dataTransfer.setData('fromZone', 'true');
+            }
         }
 
         function handleDragEnd(e) {
@@ -715,10 +743,46 @@
             const drugClass = e.dataTransfer.getData('drugClass');
             const itemId = e.dataTransfer.getData('itemId');
             const text = e.dataTransfer.getData('text/html');
+            const fromZone = e.dataTransfer.getData('fromZone');
 
             const dropZone = e.currentTarget;
             
-            // Clear previous incorrect state
+            // If dropping into word bank, return to pool
+            if (dropZone.id === 'items-grid') {
+                // Remove from old zone if it was in one
+                const oldZone = document.querySelector(`[data-item-id="${itemId}"]`)?.parentElement;
+                if (oldZone && oldZone.classList.contains('drop-zone')) {
+                    oldZone.innerHTML = '';
+                    oldZone.classList.remove('correct', 'incorrect');
+                }
+                
+                // Add back to word bank
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = text;
+                div.dataset.category = category;
+                div.dataset.drugClass = drugClass;
+                div.dataset.id = itemId;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                dropZone.appendChild(div);
+                
+                // Remove from old location
+                const originalItem = document.querySelector(`.item-in-zone[data-item-id="${itemId}"]`);
+                if (originalItem) {
+                    originalItem.remove();
+                }
+                
+                // Update stats
+                updateStatsFromBoard();
+                
+                return;
+            }
+
+            // Clear previous state
             dropZone.classList.remove('incorrect', 'correct');
 
             // Only allow one item per drop zone
@@ -736,10 +800,16 @@
             // Create new item in zone
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item-in-zone';
+            itemDiv.draggable = true;
             itemDiv.textContent = text;
             itemDiv.dataset.category = category;
             itemDiv.dataset.drugClass = drugClass;
             itemDiv.dataset.itemId = itemId;
+            
+            // Make items in zones draggable
+            itemDiv.addEventListener('dragstart', handleDragStart);
+            itemDiv.addEventListener('dragend', handleDragEnd);
+            
             dropZone.appendChild(itemDiv);
 
             // Remove from draggable items
@@ -748,9 +818,22 @@
                 originalItem.remove();
             }
 
+            // Check if correct immediately and show feedback
+            const isCorrect = dropZone.dataset.category === category && 
+                            dropZone.dataset.drugClass === drugClass;
+            
+            if (isCorrect) {
+                dropZone.classList.add('correct');
+            } else {
+                dropZone.classList.add('incorrect');
+            }
+
             // Update game state
             const key = `${dropZone.dataset.category}-${dropZone.dataset.drugClass}`;
             gameState[key] = { category, drugClass, itemId };
+            
+            // Update stats in real-time
+            updateStatsFromBoard();
         }
 
         function returnItemToPool(item) {
@@ -798,7 +881,30 @@
 
             if (total > 0) {
                 showFeedback(correct, total);
+            } else {
+                alert('Please place some items first!');
             }
+        }
+
+        function updateStatsFromBoard() {
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.drugClass === item.dataset.drugClass;
+                    if (isCorrect) {
+                        correct++;
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
         }
 
         function updateStats() {
