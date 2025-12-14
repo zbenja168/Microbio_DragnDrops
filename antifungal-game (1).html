@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antifungal Drug Classification Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #059669;
+            --accent: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --polyene: #8b5cf6;
+            --azole: #3b82f6;
+            --echinocandin: #10b981;
+            --flucytosine: #f59e0b;
+            --griseofulvin: #ec4899;
+            --terbinafine: #14b8a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .word-bank-container {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 180px repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-header {
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid var(--border);
+        }
+
+        .category-header:first-child {
+            background: transparent;
+            border: none;
+        }
+
+        .drug-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drug-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .polyene { background: var(--polyene); }
+        .azole { background: var(--azole); }
+        .echinocandin { background: var(--echinocandin); }
+        .flucytosine { background: var(--flucytosine); }
+        .griseofulvin { background: var(--griseofulvin); }
+        .terbinafine { background: var(--terbinafine); }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 180px repeat(6, 1fr);
+            gap: 0.75rem;
+        }
+
+        .row-label {
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            min-height: 100px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone.drag-over {
+            background: #eff6ff;
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+        }
+
+        .drop-zone.correct {
+            background: #f0fdf4;
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .drop-zone.incorrect {
+            background: #fef2f2;
+            border-color: var(--error);
+            border-style: solid;
+            animation: shake 0.4s ease;
+        }
+
+        .draggable-items {
+            background: var(--bg-main);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            max-height: 800px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .word-bank-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: move;
+            border: 2px solid var(--border);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .draggable-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .draggable-item.placed {
+            cursor: default;
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .draggable-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .draggable-items::-webkit-scrollbar-track {
+            background: var(--bg-card);
+            border-radius: 4px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-main);
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .feedback.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .feedback h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feedback-score {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .item-in-zone {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border: 2px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 1400px) {
+            .word-bank-container {
+                width: 300px;
+            }
+            
+            .game-grid, .grid-header {
+                grid-template-columns: 160px repeat(6, 1fr);
+                gap: 0.5rem;
+            }
+
+            .drop-zone {
+                min-height: 80px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-board {
+                flex-direction: column;
+            }
+
+            .word-bank-container {
+                width: 100%;
+                max-height: 400px;
+            }
+
+            .game-grid, .grid-header {
+                grid-template-columns: 140px repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 968px) {
+            h1 { font-size: 2rem; }
+            .game-board { padding: 1rem; }
+            
+            .game-grid, .grid-header {
+                grid-template-columns: 120px repeat(6, 1fr);
+                font-size: 0.8rem;
+            }
+
+            .drug-header {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+
+            .row-label {
+                font-size: 0.85rem;
+                padding: 0.75rem;
+            }
+
+            .drop-zone {
+                min-height: 70px;
+                padding: 0.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧬 Antifungal Drug Classification</h1>
+            <p class="subtitle">Drag and drop the characteristics to the correct drug class</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid-container">
+                <div class="grid-header">
+                    <div class="category-header"></div>
+                    <div class="drug-header polyene">Polyenes</div>
+                    <div class="drug-header azole">Azoles</div>
+                    <div class="drug-header echinocandin">Echinocandins</div>
+                    <div class="drug-header flucytosine">Flucytosine</div>
+                    <div class="drug-header griseofulvin">Griseofulvin</div>
+                    <div class="drug-header terbinafine">Terbinafine</div>
+                </div>
+
+                <div class="game-grid" id="game-grid">
+                    <!-- Grid will be generated by JavaScript -->
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+                    <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+                </div>
+            </div>
+
+            <div class="word-bank-container">
+                <div class="draggable-items" id="draggable-items">
+                    <div class="word-bank-title">📚 Word Bank</div>
+                    <div class="items-grid" id="items-grid">
+                        <!-- Draggable items will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback">
+        <h2>🎉 Great Job!</h2>
+        <div class="feedback-score" id="feedback-score"></div>
+        <button class="btn btn-primary" onclick="closeFeedback()">Continue</button>
+    </div>
+
+    <script>
+        const categories = [
+            'Examples',
+            'Mechanism of Action',
+            'Resistance',
+            'Pharmacokinetics',
+            'Adverse Effects',
+            'Key Features'
+        ];
+
+        const drugClasses = [
+            'polyene',
+            'azole',
+            'echinocandin',
+            'flucytosine',
+            'griseofulvin',
+            'terbinafine'
+        ];
+
+        const correctAnswers = {
+            'Examples': {
+                'polyene': 'Amphotericin B, Nystatin',
+                'azole': 'Ketoconazole, Fluconazole, Voriconazole, Itraconazole',
+                'echinocandin': 'Caspofungin, Micafungin, Anidulafungin (suffix: -fungin)',
+                'flucytosine': 'Flucytosine (5-FC)',
+                'griseofulvin': 'Griseofulvin',
+                'terbinafine': 'Terbinafine'
+            },
+            'Mechanism of Action': {
+                'polyene': 'Binds to ergosterol, forms pores in cell membrane → Fungicidal',
+                'azole': 'Inhibits 14-α-sterol demethylase → blocks ergosterol synthesis → Fungistatic',
+                'echinocandin': 'Inhibits β-glucan synthesis → disrupts fungal cell wall',
+                'flucytosine': 'Converted to 5-FU → interferes with DNA/RNA synthesis → Fungistatic',
+                'griseofulvin': 'Interferes with microtubule function → inhibits mitosis → Fungistatic',
+                'terbinafine': 'Inhibits squalene epoxidase → blocks ergosterol synthesis → Fungicidal'
+            },
+            'Resistance': {
+                'polyene': 'Decreased membrane ergosterol or modification of sterol target',
+                'azole': 'Altered CYP450 enzymes, increased efflux pumps',
+                'echinocandin': 'Mutations in β-glucan synthase',
+                'flucytosine': 'Resistance develops with monotherapy, altered metabolism',
+                'griseofulvin': 'Altered microtubule binding',
+                'terbinafine': 'Mutations in squalene epoxidase'
+            },
+            'Pharmacokinetics': {
+                'polyene': 'IV only (poor GI absorption), doesn\'t reach CNS, slow hepatic elimination',
+                'azole': 'Variable oral absorption, hepatic elimination (except fluconazole - renal)',
+                'echinocandin': 'IV only, half-life 11-48 hours, may require loading dose',
+                'flucytosine': 'Oral, distributed to CNS, renal elimination (dose adjust needed)',
+                'griseofulvin': 'Oral and topical, concentrates in keratin-rich tissues',
+                'terbinafine': 'Oral and topical, accumulates in skin, nails, hair'
+            },
+            'Adverse Effects': {
+                'polyene': 'NEPHROTOXICITY (major), renal tubular acidosis, K+/Mg2+ wasting, anemia',
+                'azole': 'Hepatotoxicity (LFT changes), QT prolongation, drug interactions',
+                'echinocandin': 'Well tolerated, minor GI effects, histamine-mediated reactions',
+                'flucytosine': 'Myelosuppression (anemia, neutropenia, thrombocytopenia), hepatotoxicity',
+                'griseofulvin': 'Photosensitivity, contraindicated in pregnancy, CYP inducer',
+                'terbinafine': 'GI upset, rash, taste disturbances, hepatotoxicity'
+            },
+            'Key Features': {
+                'polyene': 'Broad spectrum, used for serious systemic infections, lipid formulations reduce nephrotoxicity',
+                'azole': 'Strong CYP450 inhibitors (many drug interactions), fluconazole good CNS penetration',
+                'echinocandin': 'Poor oral bioavailability, excellent safety profile',
+                'flucytosine': 'NEVER use as monotherapy (resistance), synergistic with amphotericin B',
+                'griseofulvin': 'Specifically for dermatophyte infections in hair/skin/nails, long treatment duration',
+                'terbinafine': 'Effective for dermatophytes and nail infections, better than griseofulvin'
+            }
+        };
+
+        let gameState = {};
+        let stats = { correct: 0, total: 0 };
+
+        function initializeGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            // Create grid rows
+            categories.forEach(category => {
+                // Row label
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'row-label';
+                rowLabel.textContent = category;
+                grid.appendChild(rowLabel);
+
+                // Drop zones for each drug class
+                drugClasses.forEach(drugClass => {
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.drugClass = drugClass;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    grid.appendChild(dropZone);
+
+                    // Initialize game state
+                    const key = `${category}-${drugClass}`;
+                    gameState[key] = null;
+                });
+            });
+
+            createDraggableItems();
+            updateStats();
+        }
+
+        function createDraggableItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            const allItems = [];
+            
+            // Collect all answers and shuffle
+            Object.keys(correctAnswers).forEach(category => {
+                Object.keys(correctAnswers[category]).forEach(drugClass => {
+                    allItems.push({
+                        category,
+                        drugClass,
+                        text: correctAnswers[category][drugClass]
+                    });
+                });
+            });
+
+            // Shuffle array
+            allItems.sort(() => Math.random() - 0.5);
+
+            // Create draggable items
+            allItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.category = item.category;
+                div.dataset.drugClass = item.drugClass;
+                div.dataset.id = index;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+            e.dataTransfer.setData('category', e.target.dataset.category);
+            e.dataTransfer.setData('drugClass', e.target.dataset.drugClass);
+            e.dataTransfer.setData('itemId', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const category = e.dataTransfer.getData('category');
+            const drugClass = e.dataTransfer.getData('drugClass');
+            const itemId = e.dataTransfer.getData('itemId');
+            const text = e.dataTransfer.getData('text/html');
+
+            const dropZone = e.currentTarget;
+            
+            // Clear previous incorrect state
+            dropZone.classList.remove('incorrect', 'correct');
+
+            // Only allow one item per drop zone
+            if (dropZone.children.length > 0) {
+                // Return the old item to the draggable items area
+                const oldItem = dropZone.querySelector('.item-in-zone');
+                if (oldItem) {
+                    returnItemToPool(oldItem);
+                }
+            }
+
+            // Clear the drop zone
+            dropZone.innerHTML = '';
+
+            // Create new item in zone
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-in-zone';
+            itemDiv.textContent = text;
+            itemDiv.dataset.category = category;
+            itemDiv.dataset.drugClass = drugClass;
+            itemDiv.dataset.itemId = itemId;
+            dropZone.appendChild(itemDiv);
+
+            // Remove from draggable items
+            const originalItem = document.querySelector(`[data-id="${itemId}"]`);
+            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+                originalItem.remove();
+            }
+
+            // Update game state
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.drugClass}`;
+            gameState[key] = { category, drugClass, itemId };
+        }
+
+        function returnItemToPool(item) {
+            const container = document.getElementById('items-grid');
+            
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.textContent = item.textContent;
+            div.dataset.category = item.dataset.category;
+            div.dataset.drugClass = item.dataset.drugClass;
+            div.dataset.id = item.dataset.itemId;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(div);
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.drugClass === item.dataset.drugClass;
+                    
+                    if (isCorrect) {
+                        correct++;
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
+
+            if (total > 0) {
+                showFeedback(correct, total);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('total-count').textContent = stats.total;
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showFeedback(correct, total) {
+            const feedback = document.getElementById('feedback');
+            const scoreDiv = document.getElementById('feedback-score');
+            const percentage = Math.round((correct / total) * 100);
+
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 Perfect Score!';
+            } else if (percentage >= 80) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Effort!';
+            } else {
+                message = '📚 Keep Studying!';
+            }
+
+            feedback.querySelector('h2').textContent = message;
+            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            feedback.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function resetGame() {
+            // Clear all drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.remove('correct', 'incorrect');
+            });
+
+            // Reset game state
+            gameState = {};
+            stats = { correct: 0, total: 0 };
+            updateStats();
+
+            // Recreate draggable items
+            createDraggableItems();
+        }
+
+        // Initialize game on load
+        initializeGame();
+    </script>
+</body>
+</html>
