@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fungal Identification Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c5f7c;
+            --secondary: #8b4789;
+            --accent: #d4a574;
+            --correct: #4a7c59;
+            --incorrect: #a14a4a;
+            --bg-light: #faf8f5;
+            --bg-card: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e0ddd8;
+            --shadow: rgba(44, 95, 124, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e8e4df 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(212, 165, 116, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(139, 71, 137, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out 0.2s backwards;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 400px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px var(--shadow);
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .drop-zone:nth-child(1) { animation-delay: 0.1s; }
+        .drop-zone:nth-child(2) { animation-delay: 0.2s; }
+        .drop-zone:nth-child(3) { animation-delay: 0.3s; }
+        .drop-zone:nth-child(4) { animation-delay: 0.4s; }
+        .drop-zone:nth-child(5) { animation-delay: 0.5s; }
+        .drop-zone:nth-child(6) { animation-delay: 0.6s; }
+
+        .drop-zone.drag-over {
+            border-color: var(--secondary);
+            background: rgba(139, 71, 137, 0.05);
+            transform: scale(1.02);
+        }
+
+        .zone-header {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+        }
+
+        .zone-header em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .drag-items {
+            position: sticky;
+            top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeIn 1s ease-out 0.7s backwards;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .drag-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .drag-items::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: 10px;
+        }
+
+        .drag-items::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .drag-items::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        .drag-items-header {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-count-badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--bg-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .drag-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f6f3 100%);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 0.875rem;
+            cursor: move;
+            transition: all 0.3s ease, border-width 0.15s ease, box-shadow 0.3s ease;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .drag-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(44, 95, 124, 0.15);
+            border-color: var(--primary);
+        }
+
+        .drag-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .drag-item.correct {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-color: var(--correct);
+            border-width: 3px;
+            animation: correctPulse 0.6s ease;
+            box-shadow: 0 4px 16px rgba(74, 124, 89, 0.3);
+        }
+
+        .drag-item.incorrect {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-color: var(--incorrect);
+            border-width: 3px;
+            animation: shake 0.5s ease;
+            box-shadow: 0 4px 16px rgba(161, 74, 74, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        button {
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(44, 95, 124, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .celebration::before,
+        .celebration::after {
+            content: '🎉';
+            position: absolute;
+            font-size: 3rem;
+            animation: fall 3s linear;
+        }
+
+        .celebration::before {
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .celebration::after {
+            right: 20%;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fall {
+            0% {
+                top: -10%;
+                opacity: 1;
+                transform: rotate(0deg);
+            }
+            100% {
+                top: 100%;
+                opacity: 0.3;
+                transform: rotate(360deg);
+            }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease;
+            z-index: 1000;
+            max-width: 250px;
+        }
+
+        .feedback.success {
+            background: var(--correct);
+            color: white;
+        }
+
+        .feedback.error {
+            background: var(--incorrect);
+            color: white;
+        }
+
+        .feedback.info {
+            background: var(--primary);
+            color: white;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.08); }
+            50% { transform: scale(0.98); }
+            75% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translateX(8px) rotate(2deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+
+            .drag-items {
+                position: relative;
+                top: 0;
+                max-height: 400px;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .game-board {
+                grid-template-columns: 1fr;
+            }
+
+            .game-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .feedback {
+                right: 1rem;
+                left: 1rem;
+                top: 1rem;
+            }
+
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fungal Identification Challenge</h1>
+            <p class="subtitle">Match the characteristics to the correct fungus</p>
+        </header>
+
+        <div class="game-stats">
+            <div class="stat-box">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value" id="correct-count">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Incorrect</div>
+                <div class="stat-value" id="incorrect-count">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Remaining</div>
+                <div class="stat-value" id="remaining-count">48</div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <div class="drag-items" id="drag-items">
+                <div class="drag-items-header">
+                    <span>📋 Word Bank</span>
+                    <span class="item-count-badge" id="word-bank-count">48</span>
+                </div>
+                <div class="items-list" id="items-list"></div>
+            </div>
+
+            <div>
+                <div class="game-board">
+                    <div class="drop-zone" data-fungus="candida">
+                        <div class="zone-header"><em>Candida</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                    <div class="drop-zone" data-fungus="aspergillus">
+                        <div class="zone-header"><em>Aspergillus</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                    <div class="drop-zone" data-fungus="histoplasma">
+                        <div class="zone-header"><em>Histoplasma</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                    <div class="drop-zone" data-fungus="blastomyces">
+                        <div class="zone-header"><em>Blastomyces</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                    <div class="drop-zone" data-fungus="coccidioides">
+                        <div class="zone-header"><em>Coccidioides</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                    <div class="drop-zone" data-fungus="cryptococcus">
+                        <div class="zone-header"><em>Cryptococcus</em></div>
+                        <div class="items-container"></div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-primary" onclick="checkAnswers()">Show Progress</button>
+                    <button class="btn-secondary" onclick="resetGame()">Reset Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            // Candida items
+            { text: "Dimorphic but NOT thermally dimorphic", fungus: "candida" },
+            { text: "Both yeast and hyphae present in patient samples", fungus: "candida" },
+            { text: "Forms germ tubes in serum at 37°C", fungus: "candida" },
+            { text: "Normal flora in humans", fungus: "candida" },
+            { text: "White, fuzzy colonies on Sabouraud agar", fungus: "candida" },
+            { text: "Causes thrush (oropharyngeal candidiasis)", fungus: "candida" },
+            { text: "Causes vulvovaginal yeast infections", fungus: "candida" },
+            { text: "Most common cause of candidemia", fungus: "candida" },
+            
+            // Aspergillus items
+            { text: "Only exists as mold form (NOT dimorphic)", fungus: "aspergillus" },
+            { text: "Septate hyphae with acute-angle branching (<45°)", fungus: "aspergillus" },
+            { text: "Found in soil and decaying vegetation", fungus: "aspergillus" },
+            { text: "Colonies have various colors (gray, black, earth tones)", fungus: "aspergillus" },
+            { text: "Causes Allergic Bronchopulmonary Aspergillosis (ABPA)", fungus: "aspergillus" },
+            { text: "Forms aspergilloma (fungus ball) in lung cavities", fungus: "aspergillus" },
+            { text: "Requires pre-existing cavity for aspergilloma", fungus: "aspergillus" },
+            { text: "Galactomannan antigen test used for diagnosis", fungus: "aspergillus" },
+            
+            // Histoplasma items
+            { text: "Thermally dimorphic (mold in cold, yeast in heat)", fungus: "histoplasma" },
+            { text: "Small yeast (2-5 μm) with narrow-based budding", fungus: "histoplasma" },
+            { text: "Found in Ohio and Mississippi River valleys", fungus: "histoplasma" },
+            { text: "Associated with bird and bat droppings", fungus: "histoplasma" },
+            { text: "Mold has distinctive macroconidia (look like suns)", fungus: "histoplasma" },
+            { text: "Can be found inside macrophages", fungus: "histoplasma" },
+            { text: "Cave explorers (spelunkers) at high risk", fungus: "histoplasma" },
+            { text: "Can cause latent infections that reactivate", fungus: "histoplasma" },
+            
+            // Blastomyces items
+            { text: "Thermally dimorphic fungus", fungus: "blastomyces" },
+            { text: "Larger yeast with broad-based budding", fungus: "blastomyces" },
+            { text: "Found in Mississippi River valley (extends further north)", fungus: "blastomyces" },
+            { text: "NOT associated with bird/bat droppings", fungus: "blastomyces" },
+            { text: "Mold has conidia but NO macroconidia", fungus: "blastomyces" },
+            { text: "Skin is most common site of dissemination (18%)", fungus: "blastomyces" },
+            { text: "Associated with decomposing leaves and wood", fungus: "blastomyces" },
+            { text: "One species name: B. dermatitidis", fungus: "blastomyces" },
+            
+            // Coccidioides items
+            { text: "Thermally dimorphic with unique morphology", fungus: "coccidioides" },
+            { text: "Forms spherules filled with endospores at 37°C", fungus: "coccidioides" },
+            { text: "Arthroconidia at 25°C (bracelet appearance)", fungus: "coccidioides" },
+            { text: "Found in Southwestern US (Valley Fever)", fungus: "coccidioides" },
+            { text: "Common in Southern Arizona and California", fungus: "coccidioides" },
+            { text: "Spherules look like a sack of spider eggs", fungus: "coccidioides" },
+            { text: "Can cause erythema nodosum", fungus: "coccidioides" },
+            { text: "Double immunodiffusion assay for antibodies", fungus: "coccidioides" },
+            
+            // Cryptococcus items
+            { text: "NOT dimorphic (yeast form only)", fungus: "cryptococcus" },
+            { text: "Has a very large, distinctive capsule", fungus: "cryptococcus" },
+            { text: "C. gattii found on West Coast", fungus: "cryptococcus" },
+            { text: "C. neoformans not geographically defined", fungus: "cryptococcus" },
+            { text: "Most likely to cause CNS infections (meningitis)", fungus: "cryptococcus" },
+            { text: "India ink stain highlights capsule", fungus: "cryptococcus" },
+            { text: "Mucicarmine stains capsule red", fungus: "cryptococcus" },
+            { text: "Can form cryptococcomas in brain and lungs", fungus: "cryptococcus" }
+        ];
+
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let draggedElement = null;
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function initializeGame() {
+            const dragItemsContainer = document.getElementById('items-list');
+            dragItemsContainer.innerHTML = '';
+            
+            const shuffledItems = shuffleArray(items);
+            
+            shuffledItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'drag-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.fungus = item.fungus;
+                div.dataset.id = index;
+                
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+                
+                dragItemsContainer.appendChild(div);
+            });
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+
+            updateStats();
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            if (e.currentTarget === e.target) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                const zoneFungus = e.currentTarget.dataset.fungus;
+                const itemFungus = draggedElement.dataset.fungus;
+                const itemsContainer = e.currentTarget.querySelector('.items-container');
+                
+                // Check if correct
+                if (itemFungus === zoneFungus) {
+                    // Correct! Add to zone with green outline
+                    draggedElement.classList.remove('incorrect');
+                    draggedElement.classList.add('correct');
+                    itemsContainer.appendChild(draggedElement);
+                    correctCount++;
+                    showFeedback('✓ Correct!', 'success');
+                    
+                    // Check if all items are correctly placed
+                    setTimeout(() => {
+                        if (correctCount === items.length) {
+                            showCelebration();
+                            showFeedback('🎉 Perfect! All items correctly placed!', 'success', 4000);
+                        }
+                    }, 300);
+                } else {
+                    // Incorrect! Flash red and return to word bank
+                    draggedElement.classList.add('incorrect');
+                    
+                    // Briefly show it in the wrong zone
+                    itemsContainer.appendChild(draggedElement);
+                    
+                    setTimeout(() => {
+                        // Return to word bank
+                        const wordBank = document.getElementById('items-list');
+                        wordBank.appendChild(draggedElement);
+                        
+                        // Remove incorrect class after animation
+                        setTimeout(() => {
+                            draggedElement.classList.remove('incorrect');
+                        }, 300);
+                    }, 500);
+                    
+                    incorrectCount++;
+                    showFeedback('✗ Try again!', 'error');
+                }
+                
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const remaining = document.querySelectorAll('#items-list .drag-item').length;
+            document.getElementById('remaining-count').textContent = remaining;
+            document.getElementById('word-bank-count').textContent = remaining;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('incorrect-count').textContent = incorrectCount;
+        }
+
+        function showFeedback(message, type, duration = 1500) {
+            const existingFeedback = document.querySelector('.feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${type}`;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+
+            setTimeout(() => {
+                feedback.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => feedback.remove(), 300);
+            }, duration);
+        }
+
+        function showCelebration() {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                celebration.remove();
+            }, 3000);
+        }
+
+        function checkAnswers() {
+            const remaining = document.querySelectorAll('#items-list .drag-item').length;
+            const placed = items.length - remaining;
+            
+            if (remaining === 0 && correctCount === items.length) {
+                showFeedback('🎉 Perfect! All items correctly placed!', 'success', 3000);
+            } else if (remaining === 0) {
+                // This shouldn't happen with instant feedback, but just in case
+                showFeedback(`All items placed! ${correctCount} correct.`, 'info', 3000);
+            } else if (placed > 0) {
+                showFeedback(`Progress: ${correctCount} correct, ${remaining} remaining`, 'info', 3000);
+            } else {
+                showFeedback('Drag items from the word bank to the categories!', 'info', 3000);
+            }
+        }
+
+        function resetGame() {
+            correctCount = 0;
+            incorrectCount = 0;
+            
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.classList.remove('correct', 'incorrect');
+            });
+
+            document.querySelectorAll('.items-container').forEach(container => {
+                container.innerHTML = '';
+            });
+
+            initializeGame();
+            showFeedback('Game reset! Good luck!', 'info', 2000);
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
