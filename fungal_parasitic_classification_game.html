@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fungal & Parasitic Organisms Classification Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #059669;
+            --accent: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --trichophyton: #8b5cf6;
+            --epidermophyton: #3b82f6;
+            --microsporum: #10b981;
+            --malassezia: #f59e0b;
+            --sporothrix: #ec4899;
+            --naegleria: #14b8a6;
+            --toxoplasma: #ef4444;
+            --trichomonas: #8b5cf6;
+            --leishmania: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .word-bank-container {
+            width: 360px;
+            flex-shrink: 0;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 220px repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-header {
+            background: var(--bg-main);
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid var(--border);
+        }
+
+        .category-header:first-child {
+            background: transparent;
+            border: none;
+        }
+
+        .organism-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            line-height: 1.3;
+        }
+
+        .organism-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .organism-header span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .trichophyton { background: var(--trichophyton); }
+        .epidermophyton { background: var(--epidermophyton); }
+        .microsporum { background: var(--microsporum); }
+        .malassezia { background: var(--malassezia); }
+        .sporothrix-schenckii { background: var(--sporothrix); }
+        .naegleria-fowleri { background: var(--naegleria); }
+        .toxoplasma-gondii { background: var(--toxoplasma); }
+        .trichomonas-vaginalis { background: var(--trichomonas); }
+        .leishmania-spp { background: var(--leishmania); }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 220px repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            min-height: 120px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone.drag-over {
+            background: #eff6ff;
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+        }
+
+        .drop-zone.correct {
+            background: #f0fdf4;
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .drop-zone.incorrect {
+            background: #fef2f2;
+            border-color: var(--error);
+            border-style: solid;
+            animation: shake 0.4s ease;
+        }
+
+        .draggable-items {
+            background: var(--bg-main);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            min-height: 600px;
+            max-height: 800px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .word-bank-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .instant-feedback-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .instant-feedback-toggle label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .word-bank-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 85px;
+            padding: 0.6rem 0.75rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-main);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: move;
+            user-select: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .draggable-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-item.hidden {
+            display: none;
+        }
+
+        .item-in-zone {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #1e3a8a);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #047857);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .feedback-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feedback-score {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .close-btn:hover {
+            background: #1e3a8a;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .draggable-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .draggable-items::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1600px) {
+            .grid-header, .game-grid {
+                grid-template-columns: 200px repeat(3, 1fr);
+            }
+            .word-bank-container {
+                width: 340px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-board {
+                flex-direction: column;
+            }
+            .word-bank-container {
+                width: 100%;
+            }
+            .draggable-items {
+                min-height: auto;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-header, .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .category-header:first-child,
+            .organism-header {
+                display: none;
+            }
+            .category-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦠 Fungal & Parasitic Organisms Classification</h1>
+            <p class="subtitle">Match characteristics, diseases, and diagnostic features</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid-container">
+                <div class="grid-header">
+                    <div class="category-header"></div>
+                    <div class="category-header">Characteristics</div>
+                    <div class="category-header">Clinical/Disease</div>
+                    <div class="category-header">Laboratory/Diagnosis</div>
+                </div>
+
+                <div id="game-grid" class="game-grid">
+                    <!-- Grid will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="word-bank-container">
+                <div class="draggable-items">
+                    <div class="word-bank-title">📋 Word Bank</div>
+                    
+                    <div class="instant-feedback-toggle">
+                        <label for="instant-feedback">Instant Feedback</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="instant-feedback" checked onchange="toggleInstantFeedback()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="word-bank-tabs">
+                        <button class="tab-btn active" onclick="filterItems('all')">All</button>
+                        <button class="tab-btn" onclick="filterItems('Characteristics')">Characteristics</button>
+                        <button class="tab-btn" onclick="filterItems('Clinical/Disease')">Disease</button>
+                        <button class="tab-btn" onclick="filterItems('Laboratory/Diagnosis')">Lab</button>
+                    </div>
+                    <div id="items-grid" class="items-grid">
+                        <!-- Draggable items will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback-modal">
+        <div class="feedback-content">
+            <h2>🎉 Results</h2>
+            <div id="feedback-score" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = ['Characteristics', 'Clinical/Disease', 'Laboratory/Diagnosis'];
+        const organisms = ['Trichophyton', 'Epidermophyton', 'Microsporum', 'Malassezia', 'Sporothrix schenckii', 'Naegleria fowleri', 'Toxoplasma gondii', 'Trichomonas vaginalis', 'Leishmania spp.'];
+
+        const correctAnswers = {
+            'Characteristics': {
+                'Trichophyton': 'Dermatophyte; feeds on keratin; causes skin, hair, and nail infections',
+                'Epidermophyton': 'Dermatophyte; feeds on keratin; causes skin and nail infections',
+                'Microsporum': 'Dermatophyte; feeds on keratin; causes skin and hair infections',
+                'Malassezia': 'Uses lipids (not keratin); commensal yeast on sebum-rich skin',
+                'Sporothrix schenckii': 'Thermally dimorphic fungus; mold at 25°C, yeast at 37°C',
+                'Naegleria fowleri': 'Free-living amoeba; uses pseudopods; has flagellate form',
+                'Toxoplasma gondii': 'Obligate intracellular protozoan; tachyzoite and bradyzoite forms',
+                'Trichomonas vaginalis': 'Flagellated protozoan with 4 flagella; has undulating membrane',
+                'Leishmania spp.': 'Obligate intracellular; promastigote (sandfly) and amastigote (human) forms'
+            },
+            'Clinical/Disease': {
+                'Trichophyton': 'Tinea infections (capitis, corporis, cruris, pedis, unguium)',
+                'Epidermophyton': 'Tinea corporis, tinea cruris, tinea pedis, tinea unguium',
+                'Microsporum': 'Tinea capitis, tinea corporis; often from pets (M. canis)',
+                'Malassezia': 'Pityriasis versicolor; hypo- or hyperpigmented scaly patches',
+                'Sporothrix schenckii': 'Lymphocutaneous sporotrichosis; "chain of pearls" nodules',
+                'Naegleria fowleri': 'Primary amebic meningoencephalitis (PAM); 98% mortality',
+                'Toxoplasma gondii': 'Toxoplasmosis; ring-enhancing brain lesions in immunocompromised',
+                'Trichomonas vaginalis': 'Trichomoniasis; strawberry cervix, fishy discharge, pH >4.5',
+                'Leishmania spp.': 'Cutaneous, visceral (kala-azar), or mucocutaneous leishmaniasis'
+            },
+            'Laboratory/Diagnosis': {
+                'Trichophyton': 'Cigar-shaped macroconidia, microconidia, coiled hyphae',
+                'Epidermophyton': 'Smooth club-shaped macroconidia, NO microconidia',
+                'Microsporum': 'Rough-walled spindle-shaped macroconidia; fluoresces under Wood\'s lamp',
+                'Malassezia': 'KOH prep shows "spaghetti and meatballs" (hyphae and yeast)',
+                'Sporothrix schenckii': 'Cigar-shaped yeast in tissue; asteroid bodies in granulomas',
+                'Naegleria fowleri': 'Trophozoites/flagellates in CSF; PCR confirmation',
+                'Toxoplasma gondii': 'Serology (IgG/IgM); visualize tachyzoites; PCR',
+                'Trichomonas vaginalis': 'Motile flagellates on wet mount; rapid antigen or PCR',
+                'Leishmania spp.': 'Amastigotes in macrophages (bone marrow/spleen); PCR'
+            }
+        };
+
+        let gameState = {};
+        let stats = { correct: 0, total: 0 };
+        let instantFeedbackEnabled = true;
+
+        function toggleInstantFeedback() {
+            instantFeedbackEnabled = document.getElementById('instant-feedback').checked;
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+            });
+            
+            if (instantFeedbackEnabled) {
+                let correct = 0;
+                let total = 0;
+                
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    const item = zone.querySelector('.item-in-zone');
+                    if (item) {
+                        total++;
+                        const isCorrect = zone.dataset.category === item.dataset.category &&
+                                        zone.dataset.organism === item.dataset.organism;
+                        if (isCorrect) {
+                            correct++;
+                            zone.classList.add('correct');
+                        }
+                    }
+                });
+                
+                stats.correct = correct;
+                stats.total = total;
+                updateStats();
+            } else {
+                stats.correct = 0;
+                stats.total = 0;
+                updateStats();
+            }
+        }
+
+        function initializeGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            organisms.forEach(organism => {
+                // Create organism label (row header)
+                const organismLabel = document.createElement('div');
+                organismLabel.className = 'organism-header ' + organism.toLowerCase().replace(/\s+/g, '-').replace('.', '');
+                const span = document.createElement('span');
+                span.textContent = organism;
+                organismLabel.appendChild(span);
+                grid.appendChild(organismLabel);
+
+                // Create drop zones for each category
+                categories.forEach(category => {
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.organism = organism;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    grid.appendChild(dropZone);
+
+                    const key = `${category}-${organism}`;
+                    gameState[key] = null;
+                });
+            });
+
+            createDraggableItems();
+            updateStats();
+        }
+
+        function createDraggableItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            const allItems = [];
+            
+            Object.keys(correctAnswers).forEach(category => {
+                Object.keys(correctAnswers[category]).forEach(organism => {
+                    allItems.push({
+                        category,
+                        organism,
+                        text: correctAnswers[category][organism]
+                    });
+                });
+            });
+
+            allItems.sort(() => Math.random() - 0.5);
+
+            const activeTab = document.querySelector('.tab-btn.active');
+            let activeFilter = 'all';
+            if (activeTab) {
+                const activeText = activeTab.textContent;
+                const categoryMap = {
+                    'All': 'all',
+                    'Characteristics': 'Characteristics',
+                    'Disease': 'Clinical/Disease',
+                    'Lab': 'Laboratory/Diagnosis'
+                };
+                activeFilter = categoryMap[activeText] || 'all';
+            }
+
+            allItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.category = item.category;
+                div.dataset.organism = item.organism;
+                div.dataset.id = index;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                if (activeFilter !== 'all' && item.category !== activeFilter) {
+                    div.classList.add('hidden');
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.textContent);
+            e.dataTransfer.setData('category', e.target.dataset.category);
+            e.dataTransfer.setData('organism', e.target.dataset.organism);
+            e.dataTransfer.setData('itemId', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const category = e.dataTransfer.getData('category');
+            const organism = e.dataTransfer.getData('organism');
+            const itemId = e.dataTransfer.getData('itemId');
+            const text = e.dataTransfer.getData('text/html');
+
+            const dropZone = e.currentTarget;
+            
+            dropZone.classList.remove('incorrect', 'correct');
+
+            if (dropZone.children.length > 0) {
+                const oldItem = dropZone.querySelector('.item-in-zone');
+                if (oldItem) {
+                    returnItemToPool(oldItem);
+                }
+            }
+
+            const isCorrect = dropZone.dataset.category === category && 
+                            dropZone.dataset.organism === organism;
+
+            if (instantFeedbackEnabled) {
+                if (!isCorrect) {
+                    dropZone.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        dropZone.classList.remove('incorrect');
+                        
+                        const originalItem = document.querySelector(`.draggable-item[data-id="${itemId}"]`);
+                        if (!originalItem) {
+                            const container = document.getElementById('items-grid');
+                            const div = document.createElement('div');
+                            div.className = 'draggable-item';
+                            div.draggable = true;
+                            div.textContent = text;
+                            div.dataset.category = category;
+                            div.dataset.organism = organism;
+                            div.dataset.id = itemId;
+
+                            div.addEventListener('dragstart', handleDragStart);
+                            div.addEventListener('dragend', handleDragEnd);
+
+                            const activeTab = document.querySelector('.tab-btn.active');
+                            if (activeTab) {
+                                const activeText = activeTab.textContent;
+                                const categoryMap = {
+                                    'Characteristics': 'Characteristics',
+                                    'Disease': 'Clinical/Disease',
+                                    'Lab': 'Laboratory/Diagnosis'
+                                };
+                                const filterCategory = categoryMap[activeText];
+                                if (filterCategory && category !== filterCategory) {
+                                    div.classList.add('hidden');
+                                }
+                            }
+
+                            container.appendChild(div);
+                        }
+                    }, 500);
+                    
+                    return;
+                } else {
+                    dropZone.classList.add('correct');
+                    stats.correct++;
+                    stats.total++;
+                }
+            }
+
+            dropZone.innerHTML = '';
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-in-zone';
+            itemDiv.textContent = text;
+            itemDiv.dataset.category = category;
+            itemDiv.dataset.organism = organism;
+            itemDiv.dataset.itemId = itemId;
+            dropZone.appendChild(itemDiv);
+
+            const originalItem = document.querySelector(`[data-id="${itemId}"]`);
+            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+                originalItem.remove();
+            }
+
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.organism}`;
+            gameState[key] = { category, organism, itemId };
+            
+            if (instantFeedbackEnabled) {
+                updateStats();
+            }
+        }
+
+        function returnItemToPool(item) {
+            const container = document.getElementById('items-grid');
+            
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.textContent = item.textContent;
+            div.dataset.category = item.dataset.category;
+            div.dataset.organism = item.dataset.organism;
+            div.dataset.id = item.dataset.itemId;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(div);
+            
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const activeFilter = activeTab.textContent;
+                const categoryMap = {
+                    'Characteristics': 'Characteristics',
+                    'Disease': 'Clinical/Disease',
+                    'Lab': 'Laboratory/Diagnosis'
+                };
+                const filterCategory = categoryMap[activeFilter];
+                if (filterCategory && div.dataset.category !== filterCategory) {
+                    div.classList.add('hidden');
+                }
+            }
+        }
+
+        function checkAnswers() {
+            if (instantFeedbackEnabled) {
+                const total = stats.total;
+                const correct = stats.correct;
+                if (total > 0) {
+                    showFeedback(correct, total);
+                }
+                return;
+            }
+
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.organism === item.dataset.organism;
+                    
+                    if (isCorrect) {
+                        correct++;
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
+
+            if (total > 0) {
+                showFeedback(correct, total);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('total-count').textContent = stats.total;
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showFeedback(correct, total) {
+            const feedback = document.getElementById('feedback');
+            const scoreDiv = document.getElementById('feedback-score');
+            const percentage = Math.round((correct / total) * 100);
+
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 Perfect Score!';
+            } else if (percentage >= 80) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Effort!';
+            } else {
+                message = '📚 Keep Studying!';
+            }
+
+            feedback.querySelector('h2').textContent = message;
+            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            feedback.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function resetGame() {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.remove('correct', 'incorrect');
+            });
+
+            gameState = {};
+            stats = { correct: 0, total: 0 };
+            updateStats();
+
+            createDraggableItems();
+            
+            filterItems('all');
+            
+            closeFeedback();
+        }
+
+        function filterItems(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'All') ||
+                    (category === 'Characteristics' && btn.textContent === 'Characteristics') ||
+                    (category === 'Clinical/Disease' && btn.textContent === 'Disease') ||
+                    (category === 'Laboratory/Diagnosis' && btn.textContent === 'Lab')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const items = document.querySelectorAll('.draggable-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
