@@ -282,6 +282,70 @@
             display: none;
         }
 
+        .instant-feedback-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-main);
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .instant-feedback-toggle label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
         .items-grid {
             display: flex;
             flex-direction: column;
@@ -555,6 +619,15 @@
             <div class="word-bank-container">
                 <div class="draggable-items">
                     <div class="word-bank-title">📋 Word Bank</div>
+                    
+                    <div class="instant-feedback-toggle">
+                        <label for="instant-feedback">Instant Feedback</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="instant-feedback" checked onchange="toggleInstantFeedback()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
                     <div class="word-bank-tabs">
                         <button class="tab-btn active" onclick="filterItems('all')">All</button>
                         <button class="tab-btn" onclick="filterItems('Mechanism of Action')">MOA</button>
@@ -615,6 +688,44 @@
 
         let gameState = {};
         let stats = { correct: 0, total: 0 };
+        let instantFeedbackEnabled = true;
+
+        function toggleInstantFeedback() {
+            instantFeedbackEnabled = document.getElementById('instant-feedback').checked;
+            
+            // Clear all correct/incorrect visual states
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+            });
+            
+            // If turning on instant feedback, recalculate stats based on current placements
+            if (instantFeedbackEnabled) {
+                let correct = 0;
+                let total = 0;
+                
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    const item = zone.querySelector('.item-in-zone');
+                    if (item) {
+                        total++;
+                        const isCorrect = zone.dataset.category === item.dataset.category &&
+                                        zone.dataset.drugClass === item.dataset.drugClass;
+                        if (isCorrect) {
+                            correct++;
+                            zone.classList.add('correct');
+                        }
+                    }
+                });
+                
+                stats.correct = correct;
+                stats.total = total;
+                updateStats();
+            } else {
+                // Reset stats when turning off instant feedback
+                stats.correct = 0;
+                stats.total = 0;
+                updateStats();
+            }
+        }
 
         function initializeGame() {
             const grid = document.getElementById('game-grid');
@@ -753,6 +864,64 @@
                 }
             }
 
+            // Check if the placement is correct
+            const isCorrect = dropZone.dataset.category === category && 
+                            dropZone.dataset.drugClass === drugClass;
+
+            // Instant feedback mode
+            if (instantFeedbackEnabled) {
+                if (!isCorrect) {
+                    // Incorrect - show red and return to pool
+                    dropZone.classList.add('incorrect');
+                    
+                    // Briefly show incorrect state then return item
+                    setTimeout(() => {
+                        dropZone.classList.remove('incorrect');
+                        
+                        // Return to pool
+                        const originalItem = document.querySelector(`.draggable-item[data-id="${itemId}"]`);
+                        if (!originalItem) {
+                            // Item was removed, recreate it
+                            const container = document.getElementById('items-grid');
+                            const div = document.createElement('div');
+                            div.className = 'draggable-item';
+                            div.draggable = true;
+                            div.textContent = text;
+                            div.dataset.category = category;
+                            div.dataset.drugClass = drugClass;
+                            div.dataset.id = itemId;
+
+                            div.addEventListener('dragstart', handleDragStart);
+                            div.addEventListener('dragend', handleDragEnd);
+
+                            // Apply current filter
+                            const activeTab = document.querySelector('.tab-btn.active');
+                            if (activeTab) {
+                                const activeText = activeTab.textContent;
+                                const categoryMap = {
+                                    'MOA': 'Mechanism of Action',
+                                    'Indications': 'Indications',
+                                    'ADRs': 'Adverse Effects'
+                                };
+                                const filterCategory = categoryMap[activeText];
+                                if (filterCategory && category !== filterCategory) {
+                                    div.classList.add('hidden');
+                                }
+                            }
+
+                            container.appendChild(div);
+                        }
+                    }, 500);
+                    
+                    return; // Don't place the item
+                } else {
+                    // Correct - mark as correct and place
+                    dropZone.classList.add('correct');
+                    stats.correct++;
+                    stats.total++;
+                }
+            }
+
             // Clear the drop zone
             dropZone.innerHTML = '';
 
@@ -774,6 +943,10 @@
             // Update game state
             const key = `${dropZone.dataset.category}-${dropZone.dataset.drugClass}`;
             gameState[key] = { category, drugClass, itemId };
+            
+            if (instantFeedbackEnabled) {
+                updateStats();
+            }
         }
 
         function returnItemToPool(item) {
@@ -812,6 +985,17 @@
         }
 
         function checkAnswers() {
+            // If instant feedback is on, stats are already accurate
+            if (instantFeedbackEnabled) {
+                const total = stats.total;
+                const correct = stats.correct;
+                if (total > 0) {
+                    showFeedback(correct, total);
+                }
+                return;
+            }
+
+            // Manual check mode (instant feedback off)
             let correct = 0;
             let total = 0;
 
@@ -891,6 +1075,9 @@
             
             // Reset to "All" tab
             filterItems('all');
+            
+            // Close any open feedback modal
+            closeFeedback();
         }
 
         function filterItems(category) {
