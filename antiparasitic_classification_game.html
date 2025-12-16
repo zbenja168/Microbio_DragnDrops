@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antiparasitic Drug Classification Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #059669;
+            --accent: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --metronidazole: #8b5cf6;
+            --pyrimethamine: #3b82f6;
+            --pentamidine: #10b981;
+            --ivermectin: #f59e0b;
+            --benzimidazoles: #ec4899;
+            --praziquantel: #14b8a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .word-bank-container {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 180px repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-header {
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid var(--border);
+        }
+
+        .category-header:first-child {
+            background: transparent;
+            border: none;
+        }
+
+        .drug-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .drug-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .metronidazole { background: var(--metronidazole); }
+        .pyrimethamine { background: var(--pyrimethamine); }
+        .pentamidine { background: var(--pentamidine); }
+        .ivermectin { background: var(--ivermectin); }
+        .benzimidazoles { background: var(--benzimidazoles); }
+        .praziquantel { background: var(--praziquantel); }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 180px repeat(6, 1fr);
+            gap: 0.75rem;
+        }
+
+        .row-label {
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            min-height: 100px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone.drag-over {
+            background: #eff6ff;
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+        }
+
+        .drop-zone.correct {
+            background: #f0fdf4;
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .drop-zone.incorrect {
+            background: #fef2f2;
+            border-color: var(--error);
+            border-style: solid;
+            animation: shake 0.4s ease;
+        }
+
+        .draggable-items {
+            background: var(--bg-main);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            max-height: 800px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .word-bank-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .word-bank-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 0.6rem 0.75rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-main);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .draggable-item.hidden {
+            display: none;
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: move;
+            user-select: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .draggable-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .item-in-zone {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #1e3a8a);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #047857);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .feedback-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feedback-score {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .close-btn:hover {
+            background: #1e3a8a;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .draggable-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .draggable-items::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1400px) {
+            .game-board {
+                flex-direction: column;
+            }
+            .word-bank-container {
+                width: 100%;
+            }
+            .draggable-items {
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .grid-header, .game-grid {
+                grid-template-columns: 150px repeat(6, 1fr);
+            }
+            .drug-header {
+                font-size: 0.85rem;
+                padding: 0.6rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-header, .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .category-header:first-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦠 Antiparasitic Drug Classification</h1>
+            <p class="subtitle">Drag and drop to match mechanisms, indications, and adverse effects</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid-container">
+                <div class="grid-header">
+                    <div class="category-header"></div>
+                    <div class="drug-header metronidazole">Metronidazole</div>
+                    <div class="drug-header pyrimethamine">Pyrimethamine</div>
+                    <div class="drug-header pentamidine">Pentamidine</div>
+                    <div class="drug-header ivermectin">Ivermectin</div>
+                    <div class="drug-header benzimidazoles">Benzimidazoles</div>
+                    <div class="drug-header praziquantel">Praziquantel</div>
+                </div>
+
+                <div id="game-grid" class="game-grid">
+                    <!-- Grid will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="word-bank-container">
+                <div class="draggable-items">
+                    <div class="word-bank-title">📋 Word Bank</div>
+                    <div class="word-bank-tabs">
+                        <button class="tab-btn active" onclick="filterItems('all')">All</button>
+                        <button class="tab-btn" onclick="filterItems('Mechanism of Action')">MOA</button>
+                        <button class="tab-btn" onclick="filterItems('Indications')">Indications</button>
+                        <button class="tab-btn" onclick="filterItems('Adverse Effects')">ADRs</button>
+                    </div>
+                    <div id="items-grid" class="items-grid">
+                        <!-- Draggable items will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback-modal">
+        <div class="feedback-content">
+            <h2>🎉 Results</h2>
+            <div id="feedback-score" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = ['Mechanism of Action', 'Indications', 'Adverse Effects'];
+        const drugClasses = ['Metronidazole', 'Pyrimethamine', 'Pentamidine', 'Ivermectin', 'Benzimidazoles', 'Praziquantel'];
+
+        const correctAnswers = {
+            'Mechanism of Action': {
+                'Metronidazole': 'Forms free radicals that damage DNA and inhibit protein synthesis',
+                'Pyrimethamine': 'Inhibits dihydrofolate reductase (blocks folate metabolism)',
+                'Pentamidine': 'Disrupts DNA/RNA and protein synthesis',
+                'Ivermectin': 'Binds glutamate-gated chloride channels causing paralysis',
+                'Benzimidazoles': 'Inhibits microtubule formation leading to energy depletion',
+                'Praziquantel': 'Increases permeability in worms leading to paralysis'
+            },
+            'Indications': {
+                'Metronidazole': 'Giardia, Trichomonas, Amebiasis',
+                'Pyrimethamine': 'Toxoplasma',
+                'Pentamidine': 'Trichomonas',
+                'Ivermectin': 'Strongyloides, Onchocerca (river blindness), Ascaris, Enterobius',
+                'Benzimidazoles': 'Neurocysticercosis, Echinococcosis, Ascariasis, Necatoriasis',
+                'Praziquantel': 'Schistosomiasis, intestinal tapeworms'
+            },
+            'Adverse Effects': {
+                'Metronidazole': 'Nausea, metallic taste, disulfiram reaction with alcohol',
+                'Pyrimethamine': 'Folate deficiency',
+                'Pentamidine': 'Nephrotoxicity, pancreatitis, acute hypotension',
+                'Ivermectin': 'Mazzotti reaction (fever, lymphadenitis, urticaria, edema)',
+                'Benzimidazoles': 'Abdominal pain, nausea, vomiting, increased transaminases',
+                'Praziquantel': 'Itching, headache, dizziness'
+            }
+        };
+
+        let gameState = {};
+        let stats = { correct: 0, total: 0 };
+
+        function initializeGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            // Create grid rows
+            categories.forEach(category => {
+                // Row label
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'row-label';
+                rowLabel.textContent = category;
+                grid.appendChild(rowLabel);
+
+                // Drop zones for each drug class
+                drugClasses.forEach(drugClass => {
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.drugClass = drugClass;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    grid.appendChild(dropZone);
+
+                    // Initialize game state
+                    const key = `${category}-${drugClass}`;
+                    gameState[key] = null;
+                });
+            });
+
+            createDraggableItems();
+            updateStats();
+        }
+
+        function createDraggableItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            const allItems = [];
+            
+            // Collect all answers and shuffle
+            Object.keys(correctAnswers).forEach(category => {
+                Object.keys(correctAnswers[category]).forEach(drugClass => {
+                    allItems.push({
+                        category,
+                        drugClass,
+                        text: correctAnswers[category][drugClass]
+                    });
+                });
+            });
+
+            // Shuffle array
+            allItems.sort(() => Math.random() - 0.5);
+
+            // Get current active filter
+            const activeTab = document.querySelector('.tab-btn.active');
+            let activeFilter = 'all';
+            if (activeTab) {
+                const activeText = activeTab.textContent;
+                const categoryMap = {
+                    'All': 'all',
+                    'MOA': 'Mechanism of Action',
+                    'Indications': 'Indications',
+                    'ADRs': 'Adverse Effects'
+                };
+                activeFilter = categoryMap[activeText] || 'all';
+            }
+
+            // Create draggable items
+            allItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.category = item.category;
+                div.dataset.drugClass = item.drugClass;
+                div.dataset.id = index;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                // Apply filter if not "all"
+                if (activeFilter !== 'all' && item.category !== activeFilter) {
+                    div.classList.add('hidden');
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.textContent);
+            e.dataTransfer.setData('category', e.target.dataset.category);
+            e.dataTransfer.setData('drugClass', e.target.dataset.drugClass);
+            e.dataTransfer.setData('itemId', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const category = e.dataTransfer.getData('category');
+            const drugClass = e.dataTransfer.getData('drugClass');
+            const itemId = e.dataTransfer.getData('itemId');
+            const text = e.dataTransfer.getData('text/html');
+
+            const dropZone = e.currentTarget;
+            
+            // Clear previous incorrect state
+            dropZone.classList.remove('incorrect', 'correct');
+
+            // Only allow one item per drop zone
+            if (dropZone.children.length > 0) {
+                // Return the old item to the draggable items area
+                const oldItem = dropZone.querySelector('.item-in-zone');
+                if (oldItem) {
+                    returnItemToPool(oldItem);
+                }
+            }
+
+            // Clear the drop zone
+            dropZone.innerHTML = '';
+
+            // Create new item in zone
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-in-zone';
+            itemDiv.textContent = text;
+            itemDiv.dataset.category = category;
+            itemDiv.dataset.drugClass = drugClass;
+            itemDiv.dataset.itemId = itemId;
+            dropZone.appendChild(itemDiv);
+
+            // Remove from draggable items
+            const originalItem = document.querySelector(`[data-id="${itemId}"]`);
+            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+                originalItem.remove();
+            }
+
+            // Update game state
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.drugClass}`;
+            gameState[key] = { category, drugClass, itemId };
+        }
+
+        function returnItemToPool(item) {
+            const container = document.getElementById('items-grid');
+            
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.textContent = item.textContent;
+            div.dataset.category = item.dataset.category;
+            div.dataset.drugClass = item.dataset.drugClass;
+            div.dataset.id = item.dataset.itemId;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(div);
+            
+            // Apply current filter to the returned item
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const activeFilter = activeTab.textContent;
+                if (activeFilter !== 'All') {
+                    // Map tab text to category
+                    const categoryMap = {
+                        'MOA': 'Mechanism of Action',
+                        'Indications': 'Indications',
+                        'ADRs': 'Adverse Effects'
+                    };
+                    const filterCategory = categoryMap[activeFilter];
+                    if (filterCategory && div.dataset.category !== filterCategory) {
+                        div.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.drugClass === item.dataset.drugClass;
+                    
+                    if (isCorrect) {
+                        correct++;
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
+
+            if (total > 0) {
+                showFeedback(correct, total);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('total-count').textContent = stats.total;
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showFeedback(correct, total) {
+            const feedback = document.getElementById('feedback');
+            const scoreDiv = document.getElementById('feedback-score');
+            const percentage = Math.round((correct / total) * 100);
+
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 Perfect Score!';
+            } else if (percentage >= 80) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Effort!';
+            } else {
+                message = '📚 Keep Studying!';
+            }
+
+            feedback.querySelector('h2').textContent = message;
+            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            feedback.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function resetGame() {
+            // Clear all drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.remove('correct', 'incorrect');
+            });
+
+            // Reset game state
+            gameState = {};
+            stats = { correct: 0, total: 0 };
+            updateStats();
+
+            // Recreate draggable items
+            createDraggableItems();
+            
+            // Reset to "All" tab
+            filterItems('all');
+        }
+
+        function filterItems(category) {
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                // Check if this button matches the category
+                if ((category === 'all' && btn.textContent === 'All') ||
+                    (category === 'Mechanism of Action' && btn.textContent === 'MOA') ||
+                    (category === 'Indications' && btn.textContent === 'Indications') ||
+                    (category === 'Adverse Effects' && btn.textContent === 'ADRs')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Filter items
+            const items = document.querySelectorAll('.draggable-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize game on load
+        initializeGame();
+    </script>
+</body>
+</html>
