@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antiviral Drugs Classification Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Antiviral Drug Classification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --secondary: #10b981;
-            --accent: #f59e0b;
-            --bg-main: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: #475569;
-            --success: #10b981;
-            --error: #ef4444;
-            --acyclovir: #06b6d4;
-            --ganciclovir: #8b5cf6;
-            --foscarnet: #ec4899;
-            --tenofovir: #f59e0b;
-            --efavirenz: #10b981;
-            --dolutegravir: #3b82f6;
-            --darunavir: #ef4444;
-            --oseltamivir: #14b8a6;
-            --ribavirin: #f97316;
+            --primary: #c9a961;
+            --secondary: #2c5f7c;
+            --accent: #8b5a3c;
+            --bg-main: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a8a8a8;
+            --border: #3d3d3d;
+            --success: #5c8f5f;
+            --error: #a14545;
+            --guanosine: #6b4c8a;
+            --dna-poly: #4d6b8a;
+            --nrti: #a14545;
+            --nnrti: #8b4545;
+            --insti: #7c4a7c;
+            --protease: #4a7c9c;
+            --entry: #5a7d5a;
+            --neuraminidase: #8a6b4d;
         }
 
         * {
@@ -36,8 +35,8 @@
         }
 
         body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            font-family: 'Lora', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 2rem;
             color: var(--text-primary);
@@ -55,10 +54,10 @@
         }
 
         h1 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 3rem;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--primary);
             margin-bottom: 0.5rem;
             text-shadow: 2px 4px 8px rgba(0,0,0,0.5);
             letter-spacing: -0.02em;
@@ -67,7 +66,9 @@
         .subtitle {
             font-size: 1.1rem;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 0.05em;
         }
 
         .stats {
@@ -79,11 +80,11 @@
         }
 
         .stat-card {
-            background: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
             padding: 1rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(201, 169, 97, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -91,26 +92,28 @@
         }
 
         .stat-value {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .stat-label {
             font-size: 0.875rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             font-weight: 600;
+            margin-top: 0.25rem;
         }
 
         .game-board {
-            background: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
             border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            border: 1px solid rgba(201, 169, 97, 0.15);
             animation: fadeInUp 0.8s ease-out 0.4s backwards;
             display: flex;
             flex-direction: row;
@@ -124,143 +127,155 @@
         }
 
         .word-bank-container {
-            width: 360px;
+            width: 400px;
             flex-shrink: 0;
         }
 
         .grid-header {
             display: grid;
-            grid-template-columns: 200px repeat(9, 1fr);
+            grid-template-columns: 220px repeat(8, minmax(140px, 1fr));
             gap: 0.6rem;
             margin-bottom: 1rem;
         }
 
         .category-header {
-            background: var(--bg-card);
-            padding: 1.25rem;
-            border-radius: 10px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            padding: 1rem;
+            border-radius: 12px;
             text-align: center;
-            font-weight: 700;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border: 1px solid var(--border);
+            letter-spacing: 0.08em;
+            border: 1px solid rgba(201, 169, 97, 0.2);
             color: var(--text-primary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            min-width: 140px;
         }
 
         .category-header:first-child {
             background: transparent;
             border: none;
+            box-shadow: none;
         }
 
-        .drug-header {
-            font-family: 'Poppins', sans-serif;
+        .class-header {
+            font-family: 'Playfair Display', serif;
             font-weight: 700;
             font-size: 0.85rem;
             padding: 1rem 0.5rem;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             position: relative;
             overflow: hidden;
             text-align: center;
             line-height: 1.3;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 140px;
+            word-wrap: break-word;
         }
 
-        .drug-header::before {
+        .class-header::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
         }
 
-        .acyclovir { background: var(--acyclovir); }
-        .ganciclovir { background: var(--ganciclovir); }
-        .foscarnet { background: var(--foscarnet); }
-        .tenofovir { background: var(--tenofovir); }
-        .efavirenz { background: var(--efavirenz); }
-        .dolutegravir { background: var(--dolutegravir); }
-        .darunavir { background: var(--darunavir); }
-        .oseltamivir { background: var(--oseltamivir); }
-        .ribavirin { background: var(--ribavirin); }
+        .guanosine { background: linear-gradient(135deg, var(--guanosine), #533869); }
+        .dna-poly { background: linear-gradient(135deg, var(--dna-poly), #3d5269); }
+        .nrti { background: linear-gradient(135deg, var(--nrti), #7d3333); }
+        .nnrti { background: linear-gradient(135deg, var(--nnrti), #6b3333); }
+        .insti { background: linear-gradient(135deg, var(--insti), #5f3b5f); }
+        .protease { background: linear-gradient(135deg, var(--protease), #375f7a); }
+        .entry { background: linear-gradient(135deg, var(--entry), #476347); }
+        .neuraminidase { background: linear-gradient(135deg, var(--neuraminidase), #6b5239); }
 
         .row-label {
-            background: var(--bg-card);
-            padding: 1rem;
-            border-radius: 10px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            padding: 0.85rem;
+            border-radius: 12px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            border: 1px solid var(--border);
-            font-size: 0.95rem;
+            border: 1px solid rgba(201, 169, 97, 0.2);
+            font-size: 0.88rem;
             color: var(--text-primary);
-            height: 110px;
+            min-height: 110px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: 200px repeat(9, 1fr);
+            grid-template-columns: 220px repeat(8, minmax(140px, 1fr));
             gap: 0.6rem;
         }
 
         .drop-zone {
-            background: var(--bg-main);
-            border: 2px dashed var(--border);
+            background: rgba(0,0,0,0.3);
+            border: 2px dashed rgba(201, 169, 97, 0.3);
             border-radius: 10px;
-            height: 110px;
-            padding: 0.75rem;
+            min-height: 110px;
+            min-width: 140px;
+            padding: 0.7rem;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            overflow-y: auto;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .drop-zone.drag-over {
-            background: var(--bg-card);
+            background: rgba(201, 169, 97, 0.1);
             border-color: var(--primary);
             transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3), inset 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .drop-zone.correct {
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(92, 143, 95, 0.15);
             border-color: var(--success);
             border-style: solid;
+            box-shadow: 0 0 12px rgba(92, 143, 95, 0.4);
         }
 
         .drop-zone.incorrect {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(161, 69, 69, 0.15);
             border-color: var(--error);
             border-style: solid;
             animation: shake 0.4s ease;
+            box-shadow: 0 0 12px rgba(161, 69, 69, 0.4);
         }
 
         .draggable-items {
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 1rem;
-            min-height: 600px;
-            max-height: 800px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border-radius: 15px;
+            border: 1px solid rgba(201, 169, 97, 0.2);
+            padding: 1.25rem;
+            min-height: 500px;
+            max-height: 700px;
             overflow-y: auto;
             position: sticky;
             top: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
 
         .word-bank-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-primary);
+            font-size: 1.2rem;
+            color: var(--primary);
             margin-bottom: 1rem;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .instant-feedback-toggle {
@@ -270,17 +285,18 @@
             gap: 0.75rem;
             margin-bottom: 1rem;
             padding: 0.75rem;
-            background: var(--bg-main);
-            border-radius: 10px;
-            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(201, 169, 97, 0.2);
         }
 
         .instant-feedback-toggle label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
             cursor: pointer;
             user-select: none;
+            letter-spacing: 0.05em;
         }
 
         .toggle-switch {
@@ -305,6 +321,7 @@
             background-color: var(--border);
             border-radius: 26px;
             transition: 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .toggle-slider:before {
@@ -317,6 +334,7 @@
             background-color: white;
             border-radius: 50%;
             transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .toggle-switch input:checked + .toggle-slider {
@@ -329,35 +347,39 @@
 
         .word-bank-tabs {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             margin-bottom: 1rem;
             flex-wrap: wrap;
         }
 
         .tab-btn {
             flex: 1;
-            min-width: 60px;
-            padding: 0.6rem 0.4rem;
-            border: 1px solid var(--border);
-            background: var(--bg-main);
-            border-radius: 8px;
-            font-size: 0.7rem;
+            min-width: 52px;
+            padding: 0.6rem 0.35rem;
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             text-align: center;
             color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         .tab-btn:hover {
             border-color: var(--primary);
-            background: var(--bg-secondary);
+            background: rgba(201, 169, 97, 0.1);
+            transform: translateY(-2px);
         }
 
         .tab-btn.active {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), #a88a4d);
+            color: var(--bg-main);
             border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(201, 169, 97, 0.3);
         }
 
         .items-grid {
@@ -367,23 +389,24 @@
         }
 
         .draggable-item {
-            background: var(--bg-main);
-            padding: 0.9rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.4);
+            padding: 0.85rem;
+            border-radius: 10px;
+            border: 1px solid rgba(201, 169, 97, 0.25);
             cursor: move;
             user-select: none;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
             color: var(--text-primary);
         }
 
         .draggable-item:hover {
             border-color: var(--primary);
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(201, 169, 97, 0.3);
+            transform: translateY(-3px);
+            background: rgba(201, 169, 97, 0.1);
         }
 
         .draggable-item.dragging {
@@ -395,56 +418,76 @@
         }
 
         .item-in-zone {
-            background: var(--bg-card);
+            background: rgba(0,0,0,0.5);
             padding: 0.6rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            line-height: 1.3;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            border: 1px solid rgba(201, 169, 97, 0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-top: 2rem;
             animation: fadeIn 0.8s ease-out 0.6s backwards;
         }
 
         .btn {
-            font-family: 'Poppins', sans-serif;
-            padding: 0.9rem 2rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            padding: 0.875rem 2.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            letter-spacing: 0.1em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #2563eb);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), #a88a4d);
+            color: var(--bg-main);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(201, 169, 97, 0.4);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary), #059669);
-            color: white;
+            background: transparent;
+            color: var(--primary);
         }
 
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+            background: rgba(201, 169, 97, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(201, 169, 97, 0.2);
         }
 
         .feedback-modal {
@@ -453,12 +496,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(4px);
         }
 
         .feedback-modal.show {
@@ -466,43 +510,51 @@
         }
 
         .feedback-content {
-            background: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             padding: 3rem;
             border-radius: 20px;
             text-align: center;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            border: 2px solid rgba(201, 169, 97, 0.3);
             animation: scaleIn 0.3s ease;
         }
 
         .feedback-content h2 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
             font-weight: 800;
             color: var(--primary);
             margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .feedback-score {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-secondary);
             margin-bottom: 2rem;
+            line-height: 1.6;
         }
 
         .close-btn {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), #a88a4d);
+            color: var(--bg-main);
             border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 0.875rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 0 4px 12px rgba(201, 169, 97, 0.4);
+            transition: all 0.3s ease;
         }
 
         .close-btn:hover {
-            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(201, 169, 97, 0.5);
         }
 
         @keyframes fadeInDown {
@@ -554,7 +606,7 @@
         }
 
         .draggable-items::-webkit-scrollbar-track {
-            background: var(--bg-main);
+            background: rgba(0,0,0,0.3);
             border-radius: 10px;
         }
 
@@ -563,30 +615,24 @@
             border-radius: 10px;
         }
 
-        .drop-zone::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .drop-zone::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .drop-zone::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
-
         @media (max-width: 1600px) {
             .grid-header, .game-grid {
-                grid-template-columns: 180px repeat(9, 1fr);
+                grid-template-columns: 200px repeat(8, minmax(130px, 1fr));
                 gap: 0.5rem;
             }
             .word-bank-container {
-                width: 340px;
+                width: 380px;
             }
-            .drug-header {
-                font-size: 0.8rem;
-                padding: 0.75rem 0.4rem;
+            .class-header {
+                font-size: 0.75rem;
+                padding: 0.875rem 0.4rem;
+                min-width: 130px;
+            }
+            .drop-zone {
+                min-width: 130px;
+            }
+            .category-header {
+                min-width: 130px;
             }
         }
 
@@ -619,8 +665,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>💊 Antiviral Drugs Mastery</h1>
-            <p class="subtitle">Match drug classes, mechanisms, indications, and adverse effects</p>
+            <h1>💊 Antiviral Drug Classification</h1>
+            <p class="subtitle">Comprehensive drug class characteristics & mechanisms</p>
         </header>
 
         <div class="stats">
@@ -642,15 +688,14 @@
             <div class="grid-container">
                 <div class="grid-header">
                     <div class="category-header"></div>
-                    <div class="drug-header acyclovir">Acyclovir</div>
-                    <div class="drug-header ganciclovir">Ganciclovir</div>
-                    <div class="drug-header foscarnet">Foscarnet</div>
-                    <div class="drug-header tenofovir">Tenofovir</div>
-                    <div class="drug-header efavirenz">Efavirenz</div>
-                    <div class="drug-header dolutegravir">Dolutegravir</div>
-                    <div class="drug-header darunavir">Darunavir</div>
-                    <div class="drug-header oseltamivir">Oseltamivir</div>
-                    <div class="drug-header ribavirin">Ribavirin</div>
+                    <div class="class-header guanosine">Guanosine Analogs</div>
+                    <div class="class-header dna-poly">Viral DNA Polymerase Inhibitors</div>
+                    <div class="class-header nrti">NRTIs</div>
+                    <div class="class-header nnrti">NNRTIs</div>
+                    <div class="class-header insti">INSTIs</div>
+                    <div class="class-header protease">Protease Inhibitors</div>
+                    <div class="class-header entry">Entry/Fusion Inhibitors</div>
+                    <div class="class-header neuraminidase">Neuraminidase Inhibitors</div>
                 </div>
 
                 <div id="game-grid" class="game-grid">
@@ -660,7 +705,7 @@
 
             <div class="word-bank-container">
                 <div class="draggable-items">
-                    <div class="word-bank-title">📋 Word Bank</div>
+                    <div class="word-bank-title">Word Bank</div>
                     
                     <div class="instant-feedback-toggle">
                         <label for="instant-feedback">Instant Feedback</label>
@@ -672,9 +717,10 @@
                     
                     <div class="word-bank-tabs">
                         <button class="tab-btn active" onclick="filterItems('all')">All</button>
-                        <button class="tab-btn" onclick="filterItems('Drug Class')">Class</button>
-                        <button class="tab-btn" onclick="filterItems('Mechanism of Action')">MOA</button>
-                        <button class="tab-btn" onclick="filterItems('Indications/Use')">Use</button>
+                        <button class="tab-btn" onclick="filterItems('Mechanism')">MOA</button>
+                        <button class="tab-btn" onclick="filterItems('Key Drugs')">Drugs</button>
+                        <button class="tab-btn" onclick="filterItems('Indications')">Use</button>
+                        <button class="tab-btn" onclick="filterItems('Activation/Resistance')">Resistance</button>
                         <button class="tab-btn" onclick="filterItems('Adverse Effects')">ADRs</button>
                         <button class="tab-btn" onclick="filterItems('Special Considerations')">Notes</button>
                     </div>
@@ -693,71 +739,85 @@
 
     <div id="feedback" class="feedback-modal">
         <div class="feedback-content">
-            <h2>🎉 Results</h2>
+            <h2>Results</h2>
             <div id="feedback-score" class="feedback-score"></div>
             <button class="close-btn" onclick="closeFeedback()">Close</button>
         </div>
     </div>
 
     <script>
-        const categories = ['Drug Class', 'Mechanism of Action', 'Indications/Use', 'Adverse Effects', 'Special Considerations'];
-        const drugs = ['Acyclovir', 'Ganciclovir', 'Foscarnet', 'Tenofovir', 'Efavirenz', 'Dolutegravir', 'Darunavir', 'Oseltamivir', 'Ribavirin'];
+        const categories = ['Mechanism', 'Key Drugs', 'Indications', 'Activation/Resistance', 'Adverse Effects', 'Special Considerations'];
+        const drugClasses = [
+            'Guanosine Analogs',
+            'Viral DNA Polymerase Inhibitors', 
+            'NRTIs',
+            'NNRTIs',
+            'INSTIs',
+            'Protease Inhibitors',
+            'Entry/Fusion Inhibitors',
+            'Neuraminidase Inhibitors'
+        ];
 
         const correctAnswers = {
-            'Drug Class': {
-                'Acyclovir': 'Guanosine analog (antiherpetic)',
-                'Ganciclovir': 'Guanosine analog (antiherpetic)',
-                'Foscarnet': 'Viral DNA polymerase inhibitor (pyrophosphate analog)',
-                'Tenofovir': 'Nucleotide reverse transcriptase inhibitor (NRTI)',
-                'Efavirenz': 'Non-nucleoside reverse transcriptase inhibitor (NNRTI)',
-                'Dolutegravir': 'Integrase strand transfer inhibitor (INSTI)',
-                'Darunavir': 'Protease inhibitor (PI)',
-                'Oseltamivir': 'Neuraminidase inhibitor',
-                'Ribavirin': 'Guanosine nucleotide analog (broad-spectrum antiviral)'
+            'Mechanism': {
+                'Guanosine Analogs': 'Mimic nucleosides; incorporate into growing viral DNA strand, terminate chain elongation',
+                'Viral DNA Polymerase Inhibitors': 'Directly inhibit viral DNA polymerase (foscarnet = pyrophosphate analog, noncompetitive inhibitor)',
+                'NRTIs': 'Nucleoside/nucleotide analogs; compete with natural nucleotides, act as chain terminators for reverse transcriptase',
+                'NNRTIs': 'Bind directly to reverse transcriptase, inactivating it; stop DNA chain polymerization',
+                'INSTIs': 'Inhibit integrase enzyme; prevent viral DNA integration into host genome (irreversible)',
+                'Protease Inhibitors': 'Inhibit viral protease; prevent cutting of polyprotein chains into mature functional HIV units',
+                'Entry/Fusion Inhibitors': 'Maraviroc blocks CCR5 receptor; enfuvirtide binds gp41 to prevent fusion',
+                'Neuraminidase Inhibitors': 'Block neuraminidase enzyme; prevent release of budding viruses from infected cell membrane'
             },
-            'Mechanism of Action': {
-                'Acyclovir': 'Inhibits viral DNA synthesis; requires viral thymidine kinase activation',
-                'Ganciclovir': 'Inhibits viral DNA polymerase; activated by UL97 phosphotransferase',
-                'Foscarnet': 'Noncompetitive inhibitor of viral DNA/RNA polymerase; no activation needed',
-                'Tenofovir': 'Nucleotide analog; chain terminator of reverse transcriptase',
-                'Efavirenz': 'Binds directly to reverse transcriptase; inactivates enzyme',
-                'Dolutegravir': 'Inhibits integrase; prevents viral DNA integration into host genome',
-                'Darunavir': 'Blocks viral protease from cutting polyproteins into functional units',
-                'Oseltamivir': 'Blocks neuraminidase; prevents viral release from infected cells',
-                'Ribavirin': 'Inhibits viral RNA polymerase; mimics purine structure'
+            'Key Drugs': {
+                'Guanosine Analogs': 'Acyclovir, valacyclovir, famciclovir (HSV/VZV); ganciclovir, valganciclovir (CMV); penciclovir (topical)',
+                'Viral DNA Polymerase Inhibitors': 'Foscarnet (IV; resistant HSV/VZV, CMV retinitis); cidofovir (CMV retinitis in AIDS)',
+                'NRTIs': 'Tenofovir (TAF>TDF), emtricitabine, lamivudine, abacavir, zidovudine (AZT)',
+                'NNRTIs': 'Efavirenz, rilpivirine, nevirapine, doravirine',
+                'INSTIs': 'Dolutegravir, bictegravir, raltegravir, elvitegravir (requires boosting)',
+                'Protease Inhibitors': 'Darunavir, atazanavir, lopinavir (all require ritonavir or cobicistat boosting)',
+                'Entry/Fusion Inhibitors': 'Maraviroc (CCR5 antagonist), enfuvirtide (gp41 fusion inhibitor)',
+                'Neuraminidase Inhibitors': 'Oseltamivir (oral, drug of choice), zanamivir (inhaled)'
             },
-            'Indications/Use': {
-                'Acyclovir': 'HSV-1, HSV-2, VZV (chickenpox, shingles); oral or IV',
-                'Ganciclovir': 'CMV in immunocompromised; acyclovir-resistant HSV',
-                'Foscarnet': 'CMV retinitis in AIDS; ganciclovir-resistant CMV; acyclovir-resistant HSV',
-                'Tenofovir': 'HIV treatment; part of HAART regimen with other NRTIs',
-                'Efavirenz': 'HIV treatment; combined with NRTIs; may cause CNS effects',
-                'Dolutegravir': 'HIV treatment; first-line with 2 NRTIs; high barrier to resistance',
-                'Darunavir': 'HIV treatment; used with ritonavir boosting; for resistant strains',
-                'Oseltamivir': 'Influenza A and B; must start within 48 hours of symptoms',
-                'Ribavirin': 'Severe RSV in immunocompromised; hepatitis C (with interferon)'
+            'Indications': {
+                'Guanosine Analogs': 'HSV-1/2 (oral/genital herpes), VZV (chickenpox/shingles), CMV (immunocompromised); topical (orolabial only)',
+                'Viral DNA Polymerase Inhibitors': 'CMV retinitis (AIDS patients), acyclovir-resistant HSV/VZV; primarily immunocompromised patients',
+                'NRTIs': 'HIV treatment (always used in combination); PrEP (tenofovir + emtricitabine); backbone of HAART',
+                'NNRTIs': 'HIV treatment (combined with 2 NRTIs); most common resistance class in US',
+                'INSTIs': 'HIV first-line therapy (with 2 NRTIs); very common in most HIV regimens; high barrier to resistance',
+                'Protease Inhibitors': 'HIV treatment (often when not responding to initial therapy); pregnancy (1st trimester preferred)',
+                'Entry/Fusion Inhibitors': 'Drug-resistant HIV infection; salvage therapy',
+                'Neuraminidase Inhibitors': 'Influenza treatment (within 48 hours of onset); severe cases requiring hospitalization; high-risk patients'
+            },
+            'Activation/Resistance': {
+                'Guanosine Analogs': 'Require viral thymidine kinase (HSV) or UL97 (CMV) for activation; resistance via TK/UL97 mutations',
+                'Viral DNA Polymerase Inhibitors': 'No activation needed (foscarnet advantage); used for resistant HSV/CMV when viral kinases mutated',
+                'NRTIs': 'High mutation rate due to lack of proofreading by reverse transcriptase; multiple drugs prevent resistance',
+                'NNRTIs': 'Most common resistance class in US; bind directly so viral mutations affect binding site',
+                'INSTIs': 'High barrier to resistance; dolutegravir/bictegravir particularly resistant to mutations',
+                'Protease Inhibitors': 'Require boosting (ritonavir/cobicistat) to increase levels; resistance develops with suboptimal dosing',
+                'Entry/Fusion Inhibitors': 'Tropism testing required (CCR5 vs CXCR4); resistance less common due to limited use',
+                'Neuraminidase Inhibitors': 'H275Y mutation (His→Tyr at position 275) confers oseltamivir resistance; mutations in neuraminidase gene'
             },
             'Adverse Effects': {
-                'Acyclovir': 'Renal impairment (crystal nephropathy); increased seizure risk; elevated liver enzymes',
-                'Ganciclovir': 'Myelosuppression (leukopenia, thrombocytopenia, anemia)',
-                'Foscarnet': 'Severe renal impairment; electrolyte imbalances (hypokalemia, hypocalcemia)',
-                'Tenofovir': 'Renal injury; bone loss; use TAF formulation to reduce toxicity',
-                'Efavirenz': 'CNS toxicity (vivid dreams, dizziness); QT prolongation; elevated liver enzymes',
-                'Dolutegravir': 'Generally well tolerated; may worsen depression/psychiatric illness',
-                'Darunavir': 'Severe rash and fever; elevated liver enzymes; requires boosting',
-                'Oseltamivir': 'Headache; nausea and vomiting; generally well tolerated',
-                'Ribavirin': 'Hemolytic anemia (black box warning); teratogenic (Category X)'
+                'Guanosine Analogs': 'Renal impairment (crystal nephropathy with IV; maintain hydration); ganciclovir: myelosuppression (leukopenia, thrombocytopenia, anemia)',
+                'Viral DNA Polymerase Inhibitors': 'Foscarnet: severe renal impairment (all patients), electrolyte imbalances (↓K, ↓Ca, ↓Mg); aggressive pre-hydration required',
+                'NRTIs': 'Mitochondrial toxicity (pancreatitis, neuropathy); tenofovir: renal injury, bone loss; zidovudine: bone marrow suppression; abacavir: hypersensitivity if HLA-B*5701+',
+                'NNRTIs': 'Efavirenz: CNS toxicity, QT prolongation, ↑liver enzymes; rilpivirine: depression, insomnia',
+                'INSTIs': 'Generally well-tolerated; worsening psychiatric illness (depression), insomnia, dizziness',
+                'Protease Inhibitors': 'Diabetes/insulin resistance, hyperlipidemia, dyslipidemia; darunavir: severe rash, fever; atazanavir: nephrotoxic',
+                'Entry/Fusion Inhibitors': 'Generally well-tolerated; enfuvirtide: injection site reactions',
+                'Neuraminidase Inhibitors': 'Oseltamivir: headache, GI upset (oral); zanamivir: airway irritation (inhaled)'
             },
             'Special Considerations': {
-                'Acyclovir': 'Maintain hydration to prevent nephrotoxicity; valacyclovir is prodrug with better absorption',
-                'Ganciclovir': 'Avoid with tenofovir (compete for renal excretion); monitor blood counts',
-                'Foscarnet': 'Aggressive pre-hydration required; no viral kinase activation needed',
-                'Tenofovir': 'TAF preferred over TDF; used in PrEP and PEP regimens',
-                'Efavirenz': 'CYP450 inducer; may decrease levels of other drugs; avoid in pregnancy',
-                'Dolutegravir': 'Minimal drug interactions; pregnancy safe if already taking',
-                'Darunavir': 'Requires ritonavir or cobicistat boosting; avoid in sulfa allergy',
-                'Oseltamivir': 'Effective only within 48 hours; used for high-risk patients',
-                'Ribavirin': 'Contraindicated in pregnancy; caution with cardiac disease; monitor for anemia'
+                'Guanosine Analogs': 'Avoid ganciclovir + tenofovir (compete for renal excretion → severe renal damage); prodrugs (valacyclovir, famciclovir) have better absorption',
+                'Viral DNA Polymerase Inhibitors': 'Reserved for resistant cases; nephrotoxic with other drugs; foscarnet requires aggressive IV hydration',
+                'NRTIs': 'TAF preferred over TDF (less renal/bone toxicity); always use ≥2 NRTIs; backbone of all HIV regimens',
+                'NNRTIs': 'Efavirenz induces CYP450 (↓other drug levels); avoid in pregnancy; used with NRTIs',
+                'INSTIs': 'First-line with 2 NRTIs; dolutegravir: avoid in newly diagnosed pregnancy (neural tube defects); minimal drug interactions',
+                'Protease Inhibitors': 'Require boosting (ritonavir/cobicistat inhibit CYP450 → ↑PI levels); avoid in preterm birth risk',
+                'Entry/Fusion Inhibitors': 'Limited use; salvage therapy; tropism testing needed for maraviroc',
+                'Neuraminidase Inhibitors': 'Must start within 48 hours of symptom onset; avoid live flu vaccine within 2 weeks before or 48 hours after'
             }
         };
 
@@ -781,7 +841,7 @@
                     if (item) {
                         total++;
                         const isCorrect = zone.dataset.category === item.dataset.category &&
-                                        zone.dataset.drug === item.dataset.drug;
+                                        correctAnswers[zone.dataset.category][zone.dataset.drugClass] === item.textContent;
                         if (isCorrect) {
                             correct++;
                             zone.classList.add('correct');
@@ -791,12 +851,12 @@
                 
                 stats.correct = correct;
                 stats.total = total;
-                updateStats();
             } else {
                 stats.correct = 0;
                 stats.total = 0;
-                updateStats();
             }
+            
+            updateStats();
         }
 
         function initializeGame() {
@@ -809,11 +869,11 @@
                 rowLabel.textContent = category;
                 grid.appendChild(rowLabel);
 
-                drugs.forEach(drug => {
+                drugClasses.forEach(drugClass => {
                     const dropZone = document.createElement('div');
                     dropZone.className = 'drop-zone';
                     dropZone.dataset.category = category;
-                    dropZone.dataset.drug = drug;
+                    dropZone.dataset.drugClass = drugClass;
                     
                     dropZone.addEventListener('dragover', handleDragOver);
                     dropZone.addEventListener('dragleave', handleDragLeave);
@@ -821,7 +881,7 @@
                     
                     grid.appendChild(dropZone);
 
-                    const key = `${category}-${drug}`;
+                    const key = `${category}-${drugClass}`;
                     gameState[key] = null;
                 });
             });
@@ -836,12 +896,12 @@
 
             const allItems = [];
             
-            Object.keys(correctAnswers).forEach(category => {
-                Object.keys(correctAnswers[category]).forEach(drug => {
+            categories.forEach(category => {
+                drugClasses.forEach(drugClass => {
                     allItems.push({
                         category,
-                        drug,
-                        text: correctAnswers[category][drug]
+                        drugClass,
+                        text: correctAnswers[category][drugClass]
                     });
                 });
             });
@@ -854,9 +914,10 @@
                 const activeText = activeTab.textContent;
                 const categoryMap = {
                     'All': 'all',
-                    'Class': 'Drug Class',
-                    'MOA': 'Mechanism of Action',
-                    'Use': 'Indications/Use',
+                    'MOA': 'Mechanism',
+                    'Drugs': 'Key Drugs',
+                    'Use': 'Indications',
+                    'Resistance': 'Activation/Resistance',
                     'ADRs': 'Adverse Effects',
                     'Notes': 'Special Considerations'
                 };
@@ -869,8 +930,8 @@
                 div.draggable = true;
                 div.textContent = item.text;
                 div.dataset.category = item.category;
-                div.dataset.drug = item.drug;
-                div.dataset.id = index;
+                div.dataset.drugClass = item.drugClass;
+                div.dataset.id = `item-${index}`;
 
                 div.addEventListener('dragstart', handleDragStart);
                 div.addEventListener('dragend', handleDragEnd);
@@ -888,7 +949,7 @@
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', e.target.textContent);
             e.dataTransfer.setData('category', e.target.dataset.category);
-            e.dataTransfer.setData('drug', e.target.dataset.drug);
+            e.dataTransfer.setData('drugClass', e.target.dataset.drugClass);
             e.dataTransfer.setData('itemId', e.target.dataset.id);
         }
 
@@ -911,7 +972,7 @@
             e.currentTarget.classList.remove('drag-over');
 
             const category = e.dataTransfer.getData('category');
-            const drug = e.dataTransfer.getData('drug');
+            const drugClass = e.dataTransfer.getData('drugClass');
             const itemId = e.dataTransfer.getData('itemId');
             const text = e.dataTransfer.getData('text/html');
 
@@ -927,7 +988,7 @@
             }
 
             const isCorrect = dropZone.dataset.category === category && 
-                            dropZone.dataset.drug === drug;
+                            correctAnswers[category][dropZone.dataset.drugClass] === text;
 
             if (instantFeedbackEnabled) {
                 if (!isCorrect) {
@@ -944,19 +1005,20 @@
                             div.draggable = true;
                             div.textContent = text;
                             div.dataset.category = category;
-                            div.dataset.drug = drug;
+                            div.dataset.drugClass = drugClass;
                             div.dataset.id = itemId;
 
                             div.addEventListener('dragstart', handleDragStart);
                             div.addEventListener('dragend', handleDragEnd);
 
-                            const activeTab = document.querySelector('.tab-btn.active');
+                            const activeTab = container.parentElement.querySelector('.tab-btn.active');
                             if (activeTab) {
                                 const activeText = activeTab.textContent;
                                 const categoryMap = {
-                                    'Class': 'Drug Class',
-                                    'MOA': 'Mechanism of Action',
-                                    'Use': 'Indications/Use',
+                                    'MOA': 'Mechanism',
+                                    'Drugs': 'Key Drugs',
+                                    'Use': 'Indications',
+                                    'Resistance': 'Activation/Resistance',
                                     'ADRs': 'Adverse Effects',
                                     'Notes': 'Special Considerations'
                                 };
@@ -984,7 +1046,7 @@
             itemDiv.className = 'item-in-zone';
             itemDiv.textContent = text;
             itemDiv.dataset.category = category;
-            itemDiv.dataset.drug = drug;
+            itemDiv.dataset.drugClass = drugClass;
             itemDiv.dataset.itemId = itemId;
             dropZone.appendChild(itemDiv);
 
@@ -993,8 +1055,8 @@
                 originalItem.remove();
             }
 
-            const key = `${dropZone.dataset.category}-${dropZone.dataset.drug}`;
-            gameState[key] = { category, drug, itemId };
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.drugClass}`;
+            gameState[key] = { category, drugClass, itemId };
             
             if (instantFeedbackEnabled) {
                 updateStats();
@@ -1009,7 +1071,7 @@
             div.draggable = true;
             div.textContent = item.textContent;
             div.dataset.category = item.dataset.category;
-            div.dataset.drug = item.dataset.drug;
+            div.dataset.drugClass = item.dataset.drugClass;
             div.dataset.id = item.dataset.itemId;
 
             div.addEventListener('dragstart', handleDragStart);
@@ -1017,13 +1079,14 @@
 
             container.appendChild(div);
             
-            const activeTab = document.querySelector('.tab-btn.active');
+            const activeTab = container.parentElement.querySelector('.tab-btn.active');
             if (activeTab) {
                 const activeFilter = activeTab.textContent;
                 const categoryMap = {
-                    'Class': 'Drug Class',
-                    'MOA': 'Mechanism of Action',
-                    'Use': 'Indications/Use',
+                    'MOA': 'Mechanism',
+                    'Drugs': 'Key Drugs',
+                    'Use': 'Indications',
+                    'Resistance': 'Activation/Resistance',
                     'ADRs': 'Adverse Effects',
                     'Notes': 'Special Considerations'
                 };
@@ -1052,7 +1115,7 @@
                 if (item) {
                     total++;
                     const isCorrect = zone.dataset.category === item.dataset.category &&
-                                    zone.dataset.drug === item.dataset.drug;
+                                    correctAnswers[zone.dataset.category][zone.dataset.drugClass] === item.textContent;
                     
                     if (isCorrect) {
                         correct++;
@@ -1088,17 +1151,17 @@
 
             let message = '';
             if (percentage === 100) {
-                message = '🏆 Perfect Score!';
+                message = '💊 Pharmacology Mastery';
             } else if (percentage >= 80) {
-                message = '🌟 Excellent Work!';
+                message = '✨ Excellent Knowledge';
             } else if (percentage >= 60) {
-                message = '👍 Good Effort!';
+                message = '📚 Good Progress';
             } else {
-                message = '📚 Keep Studying!';
+                message = '📖 Keep Studying';
             }
 
             feedback.querySelector('h2').textContent = message;
-            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            scoreDiv.textContent = `You correctly identified ${correct} of ${total} characteristics (${percentage}%)`;
             feedback.classList.add('show');
         }
 
@@ -1114,12 +1177,10 @@
 
             gameState = {};
             stats = { correct: 0, total: 0 };
+            
             updateStats();
-
             createDraggableItems();
-            
             filterItems('all');
-            
             closeFeedback();
         }
 
@@ -1127,9 +1188,10 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if ((category === 'all' && btn.textContent === 'All') ||
-                    (category === 'Drug Class' && btn.textContent === 'Class') ||
-                    (category === 'Mechanism of Action' && btn.textContent === 'MOA') ||
-                    (category === 'Indications/Use' && btn.textContent === 'Use') ||
+                    (category === 'Mechanism' && btn.textContent === 'MOA') ||
+                    (category === 'Key Drugs' && btn.textContent === 'Drugs') ||
+                    (category === 'Indications' && btn.textContent === 'Use') ||
+                    (category === 'Activation/Resistance' && btn.textContent === 'Resistance') ||
                     (category === 'Adverse Effects' && btn.textContent === 'ADRs') ||
                     (category === 'Special Considerations' && btn.textContent === 'Notes')) {
                     btn.classList.add('active');
@@ -1146,6 +1208,7 @@
             });
         }
 
+        // Initialize game
         initializeGame();
     </script>
 </body>
