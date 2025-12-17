@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Pathogen Classification</title>
+    <title>Viral Pathogen Classification - Complete</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,11 +23,19 @@
             --vzv: #4d6b8a;
             --ebv: #5a7d5a;
             --cmv: #8a6b4d;
+            --hhv67: #7d5a8a;
             --hiv: #a14545;
             --covid: #4a7c9c;
             --flu: #7c6b9c;
+            --rsv: #5a8a7d;
+            --mpv: #6b8a7d;
             --measles: #c97a5f;
+            --mumps: #9c7d5a;
+            --piv: #8a7d6b;
             --rubella: #8f5c7c;
+            --norovirus: #5a8f7d;
+            --sapovirus: #7d8f5a;
+            --rotavirus: #8f7d5a;
         }
 
         * {
@@ -49,14 +57,14 @@
             margin: 0 auto;
         }
 
-        header {
+        .page-header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             animation: fadeInDown 0.8s ease-out;
             position: relative;
         }
 
-        header::after {
+        .page-header::after {
             content: '';
             display: block;
             width: 120px;
@@ -65,7 +73,7 @@
             margin: 1.5rem auto 0;
         }
 
-        h1 {
+        .page-title {
             font-family: 'Playfair Display', serif;
             font-size: 3.5rem;
             font-weight: 800;
@@ -75,8 +83,60 @@
             letter-spacing: -0.02em;
         }
 
-        .subtitle {
+        .page-subtitle {
             font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        .game-section {
+            margin-bottom: 4rem;
+        }
+
+        .game-section-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 15px;
+            border: 1px solid rgba(201, 169, 97, 0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .game-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .game-section-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.5);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1rem;
             color: var(--text-secondary);
             font-weight: 400;
             font-style: italic;
@@ -87,25 +147,25 @@
             display: flex;
             justify-content: center;
             gap: 2rem;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             animation: fadeIn 0.8s ease-out 0.2s backwards;
         }
 
         .stat-card {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
-            padding: 1.25rem 2.5rem;
+            padding: 1rem 2rem;
             border-radius: 15px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
             border: 1px solid rgba(201, 169, 97, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 140px;
+            min-width: 120px;
         }
 
         .stat-value {
             font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -123,7 +183,7 @@
         .game-board {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
             border-radius: 20px;
-            padding: 2.5rem;
+            padding: 2rem;
             box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
             border: 1px solid rgba(201, 169, 97, 0.15);
             animation: fadeInUp 0.8s ease-out 0.4s backwards;
@@ -145,23 +205,27 @@
 
         .grid-header {
             display: grid;
-            grid-template-columns: 200px repeat(10, 1fr);
             gap: 0.6rem;
             margin-bottom: 1rem;
         }
 
+        .grid-header-9 {
+            grid-template-columns: 200px repeat(9, minmax(110px, 1fr));
+        }
+
         .category-header {
             background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
-            padding: 1.25rem;
+            padding: 1rem;
             border-radius: 12px;
             text-align: center;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             border: 1px solid rgba(201, 169, 97, 0.2);
             color: var(--text-primary);
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            min-width: 110px;
         }
 
         .category-header:first-child {
@@ -173,8 +237,8 @@
         .virus-header {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 0.85rem;
-            padding: 1rem 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.875rem 0.4rem;
             border-radius: 12px;
             color: white;
             position: relative;
@@ -183,6 +247,8 @@
             line-height: 1.3;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
+            min-width: 110px;
+            word-wrap: break-word;
         }
 
         .virus-header::before {
@@ -210,15 +276,23 @@
         .vzv { background: linear-gradient(135deg, var(--vzv), #3d5269); }
         .ebv { background: linear-gradient(135deg, var(--ebv), #476347); }
         .cmv { background: linear-gradient(135deg, var(--cmv), #6b5239); }
+        .hhv67 { background: linear-gradient(135deg, var(--hhv67), #5f4569); }
         .hiv { background: linear-gradient(135deg, var(--hiv), #7d3333); }
         .covid { background: linear-gradient(135deg, var(--covid), #375f7a); }
         .flu { background: linear-gradient(135deg, var(--flu), #5f5279); }
+        .rsv { background: linear-gradient(135deg, var(--rsv), #477561); }
+        .mpv { background: linear-gradient(135deg, var(--mpv), #526b5f); }
         .measles { background: linear-gradient(135deg, var(--measles), #a8604a); }
+        .mumps { background: linear-gradient(135deg, var(--mumps), #7d6247); }
+        .piv { background: linear-gradient(135deg, var(--piv), #6b6252); }
         .rubella { background: linear-gradient(135deg, var(--rubella), #704561); }
+        .norovirus { background: linear-gradient(135deg, var(--norovirus), #477561); }
+        .sapovirus { background: linear-gradient(135deg, var(--sapovirus), #637047); }
+        .rotavirus { background: linear-gradient(135deg, var(--rotavirus), #6d6247); }
 
         .row-label {
             background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 12px;
             font-weight: 600;
             display: flex;
@@ -226,29 +300,32 @@
             justify-content: center;
             text-align: center;
             border: 1px solid rgba(201, 169, 97, 0.2);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-primary);
-            height: 110px;
+            min-height: 95px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: 200px repeat(10, 1fr);
             gap: 0.6rem;
+        }
+
+        .game-grid-9 {
+            grid-template-columns: 200px repeat(9, minmax(110px, 1fr));
         }
 
         .drop-zone {
             background: rgba(0,0,0,0.3);
             border: 2px dashed rgba(201, 169, 97, 0.3);
             border-radius: 10px;
-            height: 110px;
-            padding: 0.75rem;
+            min-height: 95px;
+            min-width: 110px;
+            padding: 0.65rem;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            overflow-y: auto;
             box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
 
@@ -279,8 +356,8 @@
             border-radius: 15px;
             border: 1px solid rgba(201, 169, 97, 0.2);
             padding: 1.25rem;
-            min-height: 600px;
-            max-height: 800px;
+            min-height: 500px;
+            max-height: 700px;
             overflow-y: auto;
             position: sticky;
             top: 2rem;
@@ -290,9 +367,9 @@
         .word-bank-title {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--primary);
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -304,15 +381,15 @@
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            margin-bottom: 1.25rem;
-            padding: 0.875rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
             background: rgba(0,0,0,0.3);
             border-radius: 12px;
             border: 1px solid rgba(201, 169, 97, 0.2);
         }
 
         .instant-feedback-toggle label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
             cursor: pointer;
@@ -359,7 +436,7 @@
         }
 
         .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--primary);
+            background-color: var(--success);
         }
 
         .toggle-switch input:checked + .toggle-slider:before {
@@ -368,19 +445,19 @@
 
         .word-bank-tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
             flex-wrap: wrap;
         }
 
         .tab-btn {
             flex: 1;
-            min-width: 60px;
-            padding: 0.65rem 0.4rem;
+            min-width: 48px;
+            padding: 0.55rem 0.3rem;
             border: 1px solid rgba(201, 169, 97, 0.3);
             background: rgba(0,0,0,0.3);
             border-radius: 10px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -411,12 +488,12 @@
 
         .draggable-item {
             background: rgba(0,0,0,0.4);
-            padding: 0.9rem;
+            padding: 0.8rem;
             border-radius: 10px;
             border: 1px solid rgba(201, 169, 97, 0.25);
             cursor: move;
             user-select: none;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.3);
@@ -440,29 +517,31 @@
 
         .item-in-zone {
             background: rgba(0,0,0,0.5);
-            padding: 0.65rem;
+            padding: 0.55rem;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             line-height: 1.4;
             border: 1px solid rgba(201, 169, 97, 0.2);
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .controls {
             display: flex;
             justify-content: center;
             gap: 1.5rem;
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             animation: fadeIn 0.8s ease-out 0.6s backwards;
         }
 
         .btn {
             font-family: 'Playfair Display', serif;
-            padding: 1rem 3rem;
+            padding: 0.875rem 2.5rem;
             border: 2px solid var(--primary);
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -620,34 +699,38 @@
             75% { transform: translateX(5px); }
         }
 
-        .draggable-items::-webkit-scrollbar,
-        .drop-zone::-webkit-scrollbar {
+        .draggable-items::-webkit-scrollbar {
             width: 8px;
         }
 
-        .draggable-items::-webkit-scrollbar-track,
-        .drop-zone::-webkit-scrollbar-track {
+        .draggable-items::-webkit-scrollbar-track {
             background: rgba(0,0,0,0.3);
             border-radius: 10px;
         }
 
-        .draggable-items::-webkit-scrollbar-thumb,
-        .drop-zone::-webkit-scrollbar-thumb {
+        .draggable-items::-webkit-scrollbar-thumb {
             background: var(--primary);
             border-radius: 10px;
         }
 
         @media (max-width: 1600px) {
-            .grid-header, .game-grid {
-                grid-template-columns: 180px repeat(10, 1fr);
+            .grid-header-9, .game-grid-9 {
+                grid-template-columns: 180px repeat(9, minmax(100px, 1fr));
                 gap: 0.5rem;
             }
             .word-bank-container {
                 width: 360px;
             }
             .virus-header {
-                font-size: 0.75rem;
-                padding: 0.875rem 0.4rem;
+                font-size: 0.7rem;
+                padding: 0.75rem 0.35rem;
+                min-width: 100px;
+            }
+            .drop-zone {
+                min-width: 100px;
+            }
+            .category-header {
+                min-width: 100px;
             }
         }
 
@@ -665,10 +748,13 @@
         }
 
         @media (max-width: 900px) {
-            h1 {
+            .page-title {
                 font-size: 2.5rem;
             }
-            .grid-header, .game-grid {
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-header-9, .game-grid-9 {
                 grid-template-columns: 1fr;
             }
             .category-header:first-child {
@@ -679,104 +765,226 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>⚕ Viral Pathogen Mastery</h1>
-            <p class="subtitle">A classical approach to infectious disease</p>
-        </header>
+        <div class="page-header">
+            <h1 class="page-title">⚕ Viral Pathogen Mastery</h1>
+            <p class="page-subtitle">Complete classification of major viral pathogens</p>
+        </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="correct-count">0</div>
-                <div class="stat-label">Correct</div>
+        <!-- GAME 1: DNA Viruses & Major Pathogens -->
+        <div class="game-section">
+            <div class="game-section-header">
+                <h2 class="game-section-title">Part 1: DNA Viruses & Major Pathogens</h2>
+                <p class="game-section-description">Herpesviridae, HIV, SARS-CoV-2, and Influenza</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="total-count">0</div>
-                <div class="stat-label">Total Placed</div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="correct-count-1">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-count-1">0</div>
+                    <div class="stat-label">Total Placed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy-1">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="accuracy">0%</div>
-                <div class="stat-label">Accuracy</div>
+
+            <div class="game-board">
+                <div class="grid-container">
+                    <div class="grid-header grid-header-9">
+                        <div class="category-header"></div>
+                        <div class="virus-header hsv1">HSV-1</div>
+                        <div class="virus-header hsv2">HSV-2</div>
+                        <div class="virus-header vzv">VZV</div>
+                        <div class="virus-header ebv">EBV</div>
+                        <div class="virus-header cmv">CMV</div>
+                        <div class="virus-header hhv67">HHV-6/7</div>
+                        <div class="virus-header hiv">HIV</div>
+                        <div class="virus-header covid">SARS-CoV-2</div>
+                        <div class="virus-header flu">Influenza</div>
+                    </div>
+
+                    <div id="game-grid-1" class="game-grid game-grid-9">
+                        <!-- Grid will be dynamically generated -->
+                    </div>
+                </div>
+
+                <div class="word-bank-container">
+                    <div class="draggable-items">
+                        <div class="word-bank-title">Word Bank 1</div>
+                        
+                        <div class="instant-feedback-toggle">
+                            <label for="instant-feedback-1">Instant Feedback</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="instant-feedback-1" checked onchange="toggleInstantFeedback(1)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="word-bank-tabs">
+                            <button class="tab-btn active" onclick="filterItems(1, 'all')">All</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Viral Family')">Family</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Genome Type')">Genome</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Primary Diseases')">Disease</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Diagnostic Hallmark')">Diagnosis</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Transmission')">Transmission</button>
+                            <button class="tab-btn" onclick="filterItems(1, 'Clinical Pearl')">Pearl</button>
+                        </div>
+                        <div id="items-grid-1" class="items-grid">
+                            <!-- Draggable items will be dynamically generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="checkAnswers(1)">Check Answers</button>
+                <button class="btn btn-secondary" onclick="resetGame(1)">Reset Game</button>
             </div>
         </div>
 
-        <div class="game-board">
-            <div class="grid-container">
-                <div class="grid-header">
-                    <div class="category-header"></div>
-                    <div class="virus-header hsv1">HSV-1</div>
-                    <div class="virus-header hsv2">HSV-2</div>
-                    <div class="virus-header vzv">VZV</div>
-                    <div class="virus-header ebv">EBV</div>
-                    <div class="virus-header cmv">CMV</div>
-                    <div class="virus-header hiv">HIV</div>
-                    <div class="virus-header covid">SARS-CoV-2</div>
-                    <div class="virus-header flu">Influenza</div>
-                    <div class="virus-header measles">Measles</div>
-                    <div class="virus-header rubella">Rubella</div>
-                </div>
+        <!-- GAME 2: Respiratory & GI Viruses -->
+        <div class="game-section">
+            <div class="game-section-header">
+                <h2 class="game-section-title">Part 2: Respiratory & GI Viruses</h2>
+                <p class="game-section-description">Paramyxoviridae, Pneumoviridae, and Gastroenteritis Viruses</p>
+            </div>
 
-                <div id="game-grid" class="game-grid">
-                    <!-- Grid will be dynamically generated -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="correct-count-2">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-count-2">0</div>
+                    <div class="stat-label">Total Placed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy-2">0%</div>
+                    <div class="stat-label">Accuracy</div>
                 </div>
             </div>
 
-            <div class="word-bank-container">
-                <div class="draggable-items">
-                    <div class="word-bank-title">Word Bank</div>
-                    
-                    <div class="instant-feedback-toggle">
-                        <label for="instant-feedback">Instant Feedback</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="instant-feedback" checked onchange="toggleInstantFeedback()">
-                            <span class="toggle-slider"></span>
-                        </label>
+            <div class="game-board">
+                <div class="grid-container">
+                    <div class="grid-header grid-header-9">
+                        <div class="category-header"></div>
+                        <div class="virus-header rsv">RSV</div>
+                        <div class="virus-header mpv">MPV</div>
+                        <div class="virus-header measles">Measles</div>
+                        <div class="virus-header mumps">Mumps</div>
+                        <div class="virus-header piv">Parainfluenza</div>
+                        <div class="virus-header rubella">Rubella</div>
+                        <div class="virus-header norovirus">Norovirus</div>
+                        <div class="virus-header sapovirus">Sapovirus</div>
+                        <div class="virus-header rotavirus">Rotavirus</div>
                     </div>
-                    
-                    <div class="word-bank-tabs">
-                        <button class="tab-btn active" onclick="filterItems('all')">All</button>
-                        <button class="tab-btn" onclick="filterItems('Genome Type')">Genome</button>
-                        <button class="tab-btn" onclick="filterItems('Primary Diseases')">Disease</button>
-                        <button class="tab-btn" onclick="filterItems('Diagnostic Hallmark')">Diagnosis</button>
-                        <button class="tab-btn" onclick="filterItems('Transmission')">Transmission</button>
-                        <button class="tab-btn" onclick="filterItems('Clinical Pearl')">Pearl</button>
+
+                    <div id="game-grid-2" class="game-grid game-grid-9">
+                        <!-- Grid will be dynamically generated -->
                     </div>
-                    <div id="items-grid" class="items-grid">
-                        <!-- Draggable items will be dynamically generated -->
+                </div>
+
+                <div class="word-bank-container">
+                    <div class="draggable-items">
+                        <div class="word-bank-title">Word Bank 2</div>
+                        
+                        <div class="instant-feedback-toggle">
+                            <label for="instant-feedback-2">Instant Feedback</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="instant-feedback-2" checked onchange="toggleInstantFeedback(2)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="word-bank-tabs">
+                            <button class="tab-btn active" onclick="filterItems(2, 'all')">All</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Viral Family')">Family</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Genome Type')">Genome</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Primary Diseases')">Disease</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Diagnostic Hallmark')">Diagnosis</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Transmission')">Transmission</button>
+                            <button class="tab-btn" onclick="filterItems(2, 'Clinical Pearl')">Pearl</button>
+                        </div>
+                        <div id="items-grid-2" class="items-grid">
+                            <!-- Draggable items will be dynamically generated -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="controls">
-            <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
-            <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="checkAnswers(2)">Check Answers</button>
+                <button class="btn btn-secondary" onclick="resetGame(2)">Reset Game</button>
+            </div>
         </div>
     </div>
 
-    <div id="feedback" class="feedback-modal">
+    <div id="feedback-1" class="feedback-modal">
         <div class="feedback-content">
             <h2>Results</h2>
-            <div id="feedback-score" class="feedback-score"></div>
-            <button class="close-btn" onclick="closeFeedback()">Close</button>
+            <div id="feedback-score-1" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback(1)">Close</button>
+        </div>
+    </div>
+
+    <div id="feedback-2" class="feedback-modal">
+        <div class="feedback-content">
+            <h2>Results</h2>
+            <div id="feedback-score-2" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback(2)">Close</button>
         </div>
     </div>
 
     <script>
-        const categories = ['Genome Type', 'Primary Diseases', 'Diagnostic Hallmark', 'Transmission', 'Clinical Pearl'];
-        const viruses = ['HSV-1', 'HSV-2', 'VZV', 'EBV', 'CMV', 'HIV', 'SARS-CoV-2', 'Influenza', 'Measles', 'Rubella'];
+        const categories = ['Viral Family', 'Genome Type', 'Primary Diseases', 'Diagnostic Hallmark', 'Transmission', 'Clinical Pearl'];
+        
+        const viruses1 = ['HSV-1', 'HSV-2', 'VZV', 'EBV', 'CMV', 'HHV-6/7', 'HIV', 'SARS-CoV-2', 'Influenza'];
+        const viruses2 = ['RSV', 'MPV', 'Measles', 'Mumps', 'Parainfluenza', 'Rubella', 'Norovirus', 'Sapovirus', 'Rotavirus'];
 
         const correctAnswers = {
+            'Viral Family': {
+                'HSV-1': 'Herpesviridae (α-herpesvirus)',
+                'HSV-2': 'Herpesviridae (α-herpesvirus)',
+                'VZV': 'Herpesviridae (α-herpesvirus)',
+                'EBV': 'Herpesviridae (γ-herpesvirus)',
+                'CMV': 'Herpesviridae (β-herpesvirus)',
+                'HHV-6/7': 'Herpesviridae (β-herpesvirus)',
+                'HIV': 'Retroviridae',
+                'SARS-CoV-2': 'Coronaviridae',
+                'Influenza': 'Orthomyxoviridae',
+                'RSV': 'Pneumoviridae',
+                'MPV': 'Pneumoviridae',
+                'Measles': 'Paramyxoviridae',
+                'Mumps': 'Paramyxoviridae',
+                'Parainfluenza': 'Paramyxoviridae',
+                'Rubella': 'Matonaviridae',
+                'Norovirus': 'Caliciviridae',
+                'Sapovirus': 'Caliciviridae',
+                'Rotavirus': 'Reoviridae'
+            },
             'Genome Type': {
                 'HSV-1': 'Linear dsDNA, enveloped, icosahedral capsid',
                 'HSV-2': 'Linear dsDNA, enveloped, icosahedral capsid',
                 'VZV': 'Linear dsDNA, enveloped, icosahedral capsid',
                 'EBV': 'Linear dsDNA, enveloped, icosahedral capsid',
                 'CMV': 'Linear dsDNA, enveloped, icosahedral capsid',
+                'HHV-6/7': 'Linear dsDNA, enveloped, icosahedral capsid',
                 'HIV': 'Two copies (+)ssRNA, enveloped; uses reverse transcriptase',
                 'SARS-CoV-2': '(+)ssRNA, enveloped, helical capsid',
                 'Influenza': 'Segmented (-)ssRNA, enveloped, replicates in nucleus',
-                'Measles': '(-)ssRNA, enveloped, helical capsid (Paramyxoviridae)',
-                'Rubella': '(+)ssRNA, non-enveloped, icosahedral (Matonaviridae)'
+                'RSV': '(-)ssRNA, enveloped, helical capsid',
+                'MPV': '(-)ssRNA, enveloped, helical capsid',
+                'Measles': '(-)ssRNA, enveloped, helical capsid',
+                'Mumps': '(-)ssRNA, enveloped, helical capsid',
+                'Parainfluenza': '(-)ssRNA, enveloped, helical capsid',
+                'Rubella': '(+)ssRNA, non-enveloped, icosahedral',
+                'Norovirus': '(+)ssRNA, non-enveloped, icosahedral',
+                'Sapovirus': '(+)ssRNA, non-enveloped, icosahedral',
+                'Rotavirus': 'Segmented dsRNA (10-12 segments), non-enveloped, icosahedral'
             },
             'Primary Diseases': {
                 'HSV-1': 'Herpes labialis (cold sores), herpetic gingivostomatitis, keratitis, encephalitis',
@@ -784,11 +992,19 @@
                 'VZV': 'Chickenpox (varicella), shingles (herpes zoster with dermatomal distribution)',
                 'EBV': 'Infectious mononucleosis, oral hairy leukoplakia, Burkitt\'s lymphoma, nasopharyngeal carcinoma',
                 'CMV': 'Mononucleosis-like illness, congenital CMV (cytomegalic inclusion disease), CMV retinitis in AIDS',
+                'HHV-6/7': 'Roseola infantum (exanthem subitum): high fever 3-5 days, then rash when fever breaks',
                 'HIV': 'AIDS (defined by CD4 <200 cells/μL or AIDS-defining illness)',
                 'SARS-CoV-2': 'COVID-19: respiratory illness, viral pneumonia, ARDS, long COVID',
                 'Influenza': 'Influenza (fever, myalgia, cough), viral pneumonia, secondary bacterial pneumonia',
-                'Measles': 'Measles: 3 C\'s (cough, coryza, conjunctivitis), maculopapular rash, complications (pneumonia, encephalitis)',
-                'Rubella': 'German measles (mild rash), congenital rubella syndrome (CRS)'
+                'RSV': 'Bronchiolitis and pneumonia in infants <1 year; most common cause in this age group',
+                'MPV': 'Similar to RSV: bronchiolitis, pneumonia; 5-12% of pediatric respiratory infections',
+                'Measles': 'Measles: 3 C\'s (cough, coryza, conjunctivitis), maculopapular rash, pneumonia, encephalitis',
+                'Mumps': 'Parotitis (parotid gland swelling), orchitis (15-30% post-pubertal males), aseptic meningitis',
+                'Parainfluenza': 'PIV-1/2: croup (barking cough, stridor, steeple sign); PIV-3: pneumonia/bronchiolitis in infants',
+                'Rubella': 'German measles (mild rash), congenital rubella syndrome (CRS)',
+                'Norovirus': 'Acute viral gastroenteritis: watery diarrhea, vomiting, cramping (self-limited)',
+                'Sapovirus': 'Viral gastroenteritis in children <5; watery diarrhea, vomiting (milder than norovirus)',
+                'Rotavirus': 'Gastroenteritis in children: severe watery diarrhea, vomiting; leading cause before vaccine'
             },
             'Diagnostic Hallmark': {
                 'HSV-1': 'Tzanck cells (multinucleated giant cells), PCR',
@@ -796,11 +1012,19 @@
                 'VZV': 'Tzanck cells (multinucleated giant cells), clinical presentation, PCR',
                 'EBV': 'Downey cells (atypical lymphocytes), monospot test (heterophile antibodies), anti-VCA IgM',
                 'CMV': 'Owl\'s eye inclusions (enlarged cells with intranuclear inclusions), PCR',
+                'HHV-6/7': 'Clinical diagnosis; PCR in immunocompromised; rash after fever distinguishes from measles',
                 'HIV': 'Antigen/antibody combo test (detects p24 and IgM/IgG), NAT/PCR for viral RNA',
                 'SARS-CoV-2': 'NAAT/RT-PCR (gold standard), rapid antigen test',
                 'Influenza': 'Rapid influenza diagnostic test (RIDT), RT-PCR, clinical presentation',
+                'RSV': 'RT-PCR; multinucleated syncytia on histology',
+                'MPV': 'RT-PCR (often multiplex panels with RSV)',
                 'Measles': 'Koplik spots (white spots in mouth), RT-PCR, IgM serology',
-                'Rubella': 'RT-PCR of nasopharyngeal swab, IgG titers for immunity assessment'
+                'Mumps': 'RT-PCR of buccal swab (after massaging parotid); IgM serology',
+                'Parainfluenza': 'RT-PCR; clinical diagnosis for croup (barking cough, stridor)',
+                'Rubella': 'RT-PCR of nasopharyngeal swab, IgG titers for immunity assessment',
+                'Norovirus': 'RT-PCR of stool/vomit (detects 10-100 viral copies); clinical diagnosis often sufficient',
+                'Sapovirus': 'RT-PCR of stool; clinically indistinguishable from norovirus',
+                'Rotavirus': 'RT-PCR of stool/vomit; multiplex panels for multiple gastroenteritis pathogens'
             },
             'Transmission': {
                 'HSV-1': 'Saliva, kissing, direct contact with lesions; asymptomatic shedding common',
@@ -808,11 +1032,19 @@
                 'VZV': 'Respiratory droplets, direct contact with vesicles; highly contagious',
                 'EBV': 'Saliva (oral secretions), "kissing disease"; asymptomatic shedding occurs',
                 'CMV': 'Body fluids (saliva, urine, blood, breast milk, semen), vertical transmission',
+                'HHV-6/7': 'Respiratory droplets; very common in childhood (>90% infected by age 2)',
                 'HIV': 'Sexual contact, blood exposure, vertical transmission (transplacental, delivery, breastfeeding)',
                 'SARS-CoV-2': 'Respiratory droplets, airborne particles; binds ACE2 receptor',
                 'Influenza': 'Respiratory droplets, fomites; highly contagious during flu season',
-                'Measles': 'Airborne droplets (highly contagious, R₀ ~15-18); patients infectious 4 days before/after rash',
-                'Rubella': 'Respiratory droplets; patients infectious 7 days before/after rash onset'
+                'RSV': 'Respiratory droplets, fomites; peaks in winter',
+                'MPV': 'Respiratory droplets; similar seasonality to RSV',
+                'Measles': 'Airborne droplets (highly contagious, R₀ ~15-18); infectious 4 days before/after rash',
+                'Mumps': 'Respiratory droplets (saliva); infectious 2 days before to 5 days after symptoms',
+                'Parainfluenza': 'Respiratory droplets, fomites; PIV-1/2 peak in fall, PIV-3 year-round',
+                'Rubella': 'Respiratory droplets; infectious 7 days before/after rash onset',
+                'Norovirus': 'Fecal-oral: contaminated food/water, surfaces, raw shellfish; cruise ship outbreaks',
+                'Sapovirus': 'Fecal-oral route; common in daycares, nursing homes, schools',
+                'Rotavirus': 'Fecal-oral transmission; proper handwashing and hygiene prevent spread'
             },
             'Clinical Pearl': {
                 'HSV-1': 'Latency in trigeminal ganglia; envelope from nuclear membrane (unusual for enveloped viruses)',
@@ -820,35 +1052,53 @@
                 'VZV': 'Latency in dorsal root ganglia; shingles presents as dermatomal rash; vaccine available (Shingrix)',
                 'EBV': 'Latency in B lymphocytes; binds CD21 (CR2) receptor; associated with multiple lymphomas',
                 'CMV': 'Most common congenital infection in US; TORCH pathogen; periventricular calcifications on imaging',
+                'HHV-6/7': 'Latency in CD4+ T cells; fever may cause febrile seizures; rash appears as fever breaks',
                 'HIV': 'Targets CD4+ T cells via CD4 and CCR5/CXCR4 coreceptors; reverse transcriptase lacks proofreading',
                 'SARS-CoV-2': 'Binds ACE2 receptor on type II pneumocytes; spike protein gives "corona" appearance',
-                'Influenza': 'Antigenic drift (minor changes, annual vaccine updates) vs shift (major changes, pandemics)',
+                'Influenza': 'Antigenic drift (minor changes, annual vaccine) vs shift (major changes, pandemics)',
+                'RSV': 'F protein causes cell fusion (syncytia); vaccine for pregnancy (32-36 weeks); nirsevimab for infants',
+                'MPV': 'Discovered 2001; clinically indistinguishable from RSV; same risk groups (infants, elderly, immunocompromised)',
                 'Measles': 'Vaccine-preventable (MMR); rash starts face/hairline, spreads downward; Koplik spots pathognomonic',
-                'Rubella': 'TORCH pathogen; CRS triad: cataracts, deafness, congenital heart defects; vaccine-preventable (MMR)'
+                'Mumps': 'Vaccine-preventable (MMR); orchitis can rarely cause infertility; complications more common in adults',
+                'Parainfluenza': 'Second most common cause of LRI in infants (after RSV); steeple sign on X-ray (subglottic narrowing)',
+                'Rubella': 'TORCH pathogen; CRS triad: cataracts, deafness, congenital heart defects; vaccine-preventable (MMR)',
+                'Norovirus': 'Non-enveloped (resistant to alcohol sanitizers); 58% of foodborne illnesses; use soap/water',
+                'Sapovirus': 'Mainly affects children <5; milder than norovirus; outbreaks in daycares',
+                'Rotavirus': 'Vaccine-preventable (live attenuated oral vaccine); 90% protection from hospitalization'
             }
         };
 
-        let gameState = {};
-        let stats = { correct: 0, total: 0 };
-        let instantFeedbackEnabled = true;
+        let gameState1 = {};
+        let gameState2 = {};
+        let stats1 = { correct: 0, total: 0 };
+        let stats2 = { correct: 0, total: 0 };
+        let instantFeedbackEnabled1 = true;
+        let instantFeedbackEnabled2 = true;
 
-        function toggleInstantFeedback() {
-            instantFeedbackEnabled = document.getElementById('instant-feedback').checked;
+        function toggleInstantFeedback(gameNum) {
+            if (gameNum === 1) {
+                instantFeedbackEnabled1 = document.getElementById('instant-feedback-1').checked;
+            } else {
+                instantFeedbackEnabled2 = document.getElementById('instant-feedback-2').checked;
+            }
             
-            document.querySelectorAll('.drop-zone').forEach(zone => {
+            const enabled = gameNum === 1 ? instantFeedbackEnabled1 : instantFeedbackEnabled2;
+            const stats = gameNum === 1 ? stats1 : stats2;
+            
+            document.querySelectorAll(`#game-grid-${gameNum} .drop-zone`).forEach(zone => {
                 zone.classList.remove('correct', 'incorrect');
             });
             
-            if (instantFeedbackEnabled) {
+            if (enabled) {
                 let correct = 0;
                 let total = 0;
                 
-                document.querySelectorAll('.drop-zone').forEach(zone => {
+                document.querySelectorAll(`#game-grid-${gameNum} .drop-zone`).forEach(zone => {
                     const item = zone.querySelector('.item-in-zone');
                     if (item) {
                         total++;
                         const isCorrect = zone.dataset.category === item.dataset.category &&
-                                        zone.dataset.virus === item.dataset.virus;
+                                        correctAnswers[zone.dataset.category][zone.dataset.virus] === item.textContent;
                         if (isCorrect) {
                             correct++;
                             zone.classList.add('correct');
@@ -858,16 +1108,17 @@
                 
                 stats.correct = correct;
                 stats.total = total;
-                updateStats();
             } else {
                 stats.correct = 0;
                 stats.total = 0;
-                updateStats();
             }
+            
+            updateStats(gameNum);
         }
 
-        function initializeGame() {
-            const grid = document.getElementById('game-grid');
+        function initializeGame(gameNum) {
+            const viruses = gameNum === 1 ? viruses1 : viruses2;
+            const grid = document.getElementById(`game-grid-${gameNum}`);
             grid.innerHTML = '';
 
             categories.forEach(category => {
@@ -881,6 +1132,7 @@
                     dropZone.className = 'drop-zone';
                     dropZone.dataset.category = category;
                     dropZone.dataset.virus = virus;
+                    dropZone.dataset.gameNum = gameNum;
                     
                     dropZone.addEventListener('dragover', handleDragOver);
                     dropZone.addEventListener('dragleave', handleDragLeave);
@@ -889,22 +1141,27 @@
                     grid.appendChild(dropZone);
 
                     const key = `${category}-${virus}`;
-                    gameState[key] = null;
+                    if (gameNum === 1) {
+                        gameState1[key] = null;
+                    } else {
+                        gameState2[key] = null;
+                    }
                 });
             });
 
-            createDraggableItems();
-            updateStats();
+            createDraggableItems(gameNum);
+            updateStats(gameNum);
         }
 
-        function createDraggableItems() {
-            const container = document.getElementById('items-grid');
+        function createDraggableItems(gameNum) {
+            const viruses = gameNum === 1 ? viruses1 : viruses2;
+            const container = document.getElementById(`items-grid-${gameNum}`);
             container.innerHTML = '';
 
             const allItems = [];
             
-            Object.keys(correctAnswers).forEach(category => {
-                Object.keys(correctAnswers[category]).forEach(virus => {
+            categories.forEach(category => {
+                viruses.forEach(virus => {
                     allItems.push({
                         category,
                         virus,
@@ -915,12 +1172,13 @@
 
             allItems.sort(() => Math.random() - 0.5);
 
-            const activeTab = document.querySelector('.tab-btn.active');
+            const activeTab = document.querySelector(`#items-grid-${gameNum}`).parentElement.querySelector('.tab-btn.active');
             let activeFilter = 'all';
             if (activeTab) {
                 const activeText = activeTab.textContent;
                 const categoryMap = {
                     'All': 'all',
+                    'Family': 'Viral Family',
                     'Genome': 'Genome Type',
                     'Disease': 'Primary Diseases',
                     'Diagnosis': 'Diagnostic Hallmark',
@@ -937,7 +1195,8 @@
                 div.textContent = item.text;
                 div.dataset.category = item.category;
                 div.dataset.virus = item.virus;
-                div.dataset.id = index;
+                div.dataset.id = `${gameNum}-${index}`;
+                div.dataset.gameNum = gameNum;
 
                 div.addEventListener('dragstart', handleDragStart);
                 div.addEventListener('dragend', handleDragEnd);
@@ -957,6 +1216,7 @@
             e.dataTransfer.setData('category', e.target.dataset.category);
             e.dataTransfer.setData('virus', e.target.dataset.virus);
             e.dataTransfer.setData('itemId', e.target.dataset.id);
+            e.dataTransfer.setData('gameNum', e.target.dataset.gameNum);
         }
 
         function handleDragEnd(e) {
@@ -981,6 +1241,7 @@
             const virus = e.dataTransfer.getData('virus');
             const itemId = e.dataTransfer.getData('itemId');
             const text = e.dataTransfer.getData('text/html');
+            const gameNum = parseInt(e.currentTarget.dataset.gameNum);
 
             const dropZone = e.currentTarget;
             
@@ -989,14 +1250,17 @@
             if (dropZone.children.length > 0) {
                 const oldItem = dropZone.querySelector('.item-in-zone');
                 if (oldItem) {
-                    returnItemToPool(oldItem);
+                    returnItemToPool(oldItem, gameNum);
                 }
             }
 
             const isCorrect = dropZone.dataset.category === category && 
-                            dropZone.dataset.virus === virus;
+                            correctAnswers[category][dropZone.dataset.virus] === text;
 
-            if (instantFeedbackEnabled) {
+            const instantEnabled = gameNum === 1 ? instantFeedbackEnabled1 : instantFeedbackEnabled2;
+            const stats = gameNum === 1 ? stats1 : stats2;
+
+            if (instantEnabled) {
                 if (!isCorrect) {
                     dropZone.classList.add('incorrect');
                     
@@ -1005,7 +1269,7 @@
                         
                         const originalItem = document.querySelector(`.draggable-item[data-id="${itemId}"]`);
                         if (!originalItem) {
-                            const container = document.getElementById('items-grid');
+                            const container = document.getElementById(`items-grid-${gameNum}`);
                             const div = document.createElement('div');
                             div.className = 'draggable-item';
                             div.draggable = true;
@@ -1013,14 +1277,16 @@
                             div.dataset.category = category;
                             div.dataset.virus = virus;
                             div.dataset.id = itemId;
+                            div.dataset.gameNum = gameNum;
 
                             div.addEventListener('dragstart', handleDragStart);
                             div.addEventListener('dragend', handleDragEnd);
 
-                            const activeTab = document.querySelector('.tab-btn.active');
+                            const activeTab = container.parentElement.querySelector('.tab-btn.active');
                             if (activeTab) {
                                 const activeText = activeTab.textContent;
                                 const categoryMap = {
+                                    'Family': 'Viral Family',
                                     'Genome': 'Genome Type',
                                     'Disease': 'Primary Diseases',
                                     'Diagnosis': 'Diagnostic Hallmark',
@@ -1056,20 +1322,24 @@
             dropZone.appendChild(itemDiv);
 
             const originalItem = document.querySelector(`[data-id="${itemId}"]`);
-            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+            if (originalItem && originalItem.parentElement.id === `items-grid-${gameNum}`) {
                 originalItem.remove();
             }
 
             const key = `${dropZone.dataset.category}-${dropZone.dataset.virus}`;
-            gameState[key] = { category, virus, itemId };
+            if (gameNum === 1) {
+                gameState1[key] = { category, virus, itemId };
+            } else {
+                gameState2[key] = { category, virus, itemId };
+            }
             
-            if (instantFeedbackEnabled) {
-                updateStats();
+            if (instantEnabled) {
+                updateStats(gameNum);
             }
         }
 
-        function returnItemToPool(item) {
-            const container = document.getElementById('items-grid');
+        function returnItemToPool(item, gameNum) {
+            const container = document.getElementById(`items-grid-${gameNum}`);
             
             const div = document.createElement('div');
             div.className = 'draggable-item';
@@ -1078,16 +1348,18 @@
             div.dataset.category = item.dataset.category;
             div.dataset.virus = item.dataset.virus;
             div.dataset.id = item.dataset.itemId;
+            div.dataset.gameNum = gameNum;
 
             div.addEventListener('dragstart', handleDragStart);
             div.addEventListener('dragend', handleDragEnd);
 
             container.appendChild(div);
             
-            const activeTab = document.querySelector('.tab-btn.active');
+            const activeTab = container.parentElement.querySelector('.tab-btn.active');
             if (activeTab) {
                 const activeFilter = activeTab.textContent;
                 const categoryMap = {
+                    'Family': 'Viral Family',
                     'Genome': 'Genome Type',
                     'Disease': 'Primary Diseases',
                     'Diagnosis': 'Diagnostic Hallmark',
@@ -1101,12 +1373,15 @@
             }
         }
 
-        function checkAnswers() {
-            if (instantFeedbackEnabled) {
+        function checkAnswers(gameNum) {
+            const instantEnabled = gameNum === 1 ? instantFeedbackEnabled1 : instantFeedbackEnabled2;
+            const stats = gameNum === 1 ? stats1 : stats2;
+
+            if (instantEnabled) {
                 const total = stats.total;
                 const correct = stats.correct;
                 if (total > 0) {
-                    showFeedback(correct, total);
+                    showFeedback(gameNum, correct, total);
                 }
                 return;
             }
@@ -1114,12 +1389,12 @@
             let correct = 0;
             let total = 0;
 
-            document.querySelectorAll('.drop-zone').forEach(zone => {
+            document.querySelectorAll(`#game-grid-${gameNum} .drop-zone`).forEach(zone => {
                 const item = zone.querySelector('.item-in-zone');
                 if (item) {
                     total++;
                     const isCorrect = zone.dataset.category === item.dataset.category &&
-                                    zone.dataset.virus === item.dataset.virus;
+                                    correctAnswers[zone.dataset.category][zone.dataset.virus] === item.textContent;
                     
                     if (isCorrect) {
                         correct++;
@@ -1134,23 +1409,24 @@
 
             stats.correct = correct;
             stats.total = total;
-            updateStats();
+            updateStats(gameNum);
 
             if (total > 0) {
-                showFeedback(correct, total);
+                showFeedback(gameNum, correct, total);
             }
         }
 
-        function updateStats() {
-            document.getElementById('correct-count').textContent = stats.correct;
-            document.getElementById('total-count').textContent = stats.total;
+        function updateStats(gameNum) {
+            const stats = gameNum === 1 ? stats1 : stats2;
+            document.getElementById(`correct-count-${gameNum}`).textContent = stats.correct;
+            document.getElementById(`total-count-${gameNum}`).textContent = stats.total;
             const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById(`accuracy-${gameNum}`).textContent = accuracy + '%';
         }
 
-        function showFeedback(correct, total) {
-            const feedback = document.getElementById('feedback');
-            const scoreDiv = document.getElementById('feedback-score');
+        function showFeedback(gameNum, correct, total) {
+            const feedback = document.getElementById(`feedback-${gameNum}`);
+            const scoreDiv = document.getElementById(`feedback-score-${gameNum}`);
             const percentage = Math.round((correct / total) * 100);
 
             let message = '';
@@ -1169,31 +1445,37 @@
             feedback.classList.add('show');
         }
 
-        function closeFeedback() {
-            document.getElementById('feedback').classList.remove('show');
+        function closeFeedback(gameNum) {
+            document.getElementById(`feedback-${gameNum}`).classList.remove('show');
         }
 
-        function resetGame() {
-            document.querySelectorAll('.drop-zone').forEach(zone => {
+        function resetGame(gameNum) {
+            document.querySelectorAll(`#game-grid-${gameNum} .drop-zone`).forEach(zone => {
                 zone.innerHTML = '';
                 zone.classList.remove('correct', 'incorrect');
             });
 
-            gameState = {};
-            stats = { correct: 0, total: 0 };
-            updateStats();
-
-            createDraggableItems();
+            if (gameNum === 1) {
+                gameState1 = {};
+                stats1 = { correct: 0, total: 0 };
+            } else {
+                gameState2 = {};
+                stats2 = { correct: 0, total: 0 };
+            }
             
-            filterItems('all');
-            
-            closeFeedback();
+            updateStats(gameNum);
+            createDraggableItems(gameNum);
+            filterItems(gameNum, 'all');
+            closeFeedback(gameNum);
         }
 
-        function filterItems(category) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+        function filterItems(gameNum, category) {
+            const container = document.getElementById(`items-grid-${gameNum}`).parentElement;
+            
+            container.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if ((category === 'all' && btn.textContent === 'All') ||
+                    (category === 'Viral Family' && btn.textContent === 'Family') ||
                     (category === 'Genome Type' && btn.textContent === 'Genome') ||
                     (category === 'Primary Diseases' && btn.textContent === 'Disease') ||
                     (category === 'Diagnostic Hallmark' && btn.textContent === 'Diagnosis') ||
@@ -1203,7 +1485,7 @@
                 }
             });
 
-            const items = document.querySelectorAll('.draggable-item');
+            const items = document.querySelectorAll(`#items-grid-${gameNum} .draggable-item`);
             items.forEach(item => {
                 if (category === 'all' || item.dataset.category === category) {
                     item.classList.remove('hidden');
@@ -1213,7 +1495,9 @@
             });
         }
 
-        initializeGame();
+        // Initialize both games
+        initializeGame(1);
+        initializeGame(2);
     </script>
 </body>
 </html>
