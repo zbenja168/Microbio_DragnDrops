@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antiviral Drugs Classification Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-main: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+            --acyclovir: #06b6d4;
+            --ganciclovir: #8b5cf6;
+            --foscarnet: #ec4899;
+            --tenofovir: #f59e0b;
+            --efavirenz: #10b981;
+            --dolutegravir: #3b82f6;
+            --darunavir: #ef4444;
+            --oseltamivir: #14b8a6;
+            --ribavirin: #f97316;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.5);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .game-board {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .word-bank-container {
+            width: 360px;
+            flex-shrink: 0;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 200px repeat(9, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-header {
+            background: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .category-header:first-child {
+            background: transparent;
+            border: none;
+        }
+
+        .drug-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 1rem 0.5rem;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .drug-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .acyclovir { background: var(--acyclovir); }
+        .ganciclovir { background: var(--ganciclovir); }
+        .foscarnet { background: var(--foscarnet); }
+        .tenofovir { background: var(--tenofovir); }
+        .efavirenz { background: var(--efavirenz); }
+        .dolutegravir { background: var(--dolutegravir); }
+        .darunavir { background: var(--darunavir); }
+        .oseltamivir { background: var(--oseltamivir); }
+        .ribavirin { background: var(--ribavirin); }
+
+        .row-label {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            height: 110px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(9, 1fr);
+            gap: 0.6rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-main);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            height: 110px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .drop-zone.drag-over {
+            background: var(--bg-card);
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .drop-zone.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .drop-zone.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--error);
+            border-style: solid;
+            animation: shake 0.4s ease;
+        }
+
+        .draggable-items {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            min-height: 600px;
+            max-height: 800px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .word-bank-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .instant-feedback-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-main);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .instant-feedback-toggle label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .word-bank-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: 0.6rem 0.4rem;
+            border: 1px solid var(--border);
+            background: var(--bg-main);
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .draggable-item {
+            background: var(--bg-main);
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: move;
+            user-select: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: var(--text-primary);
+        }
+
+        .draggable-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-item.hidden {
+            display: none;
+        }
+
+        .item-in-zone {
+            background: var(--bg-card);
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            color: var(--text-primary);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #059669);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-content {
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .feedback-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feedback-score {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .close-btn:hover {
+            background: #2563eb;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .draggable-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .draggable-items::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-radius: 10px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .drop-zone::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .drop-zone::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .drop-zone::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1600px) {
+            .grid-header, .game-grid {
+                grid-template-columns: 180px repeat(9, 1fr);
+                gap: 0.5rem;
+            }
+            .word-bank-container {
+                width: 340px;
+            }
+            .drug-header {
+                font-size: 0.8rem;
+                padding: 0.75rem 0.4rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-board {
+                flex-direction: column;
+            }
+            .word-bank-container {
+                width: 100%;
+            }
+            .draggable-items {
+                min-height: auto;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-header, .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .category-header:first-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💊 Antiviral Drugs Mastery</h1>
+            <p class="subtitle">Match drug classes, mechanisms, indications, and adverse effects</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid-container">
+                <div class="grid-header">
+                    <div class="category-header"></div>
+                    <div class="drug-header acyclovir">Acyclovir</div>
+                    <div class="drug-header ganciclovir">Ganciclovir</div>
+                    <div class="drug-header foscarnet">Foscarnet</div>
+                    <div class="drug-header tenofovir">Tenofovir</div>
+                    <div class="drug-header efavirenz">Efavirenz</div>
+                    <div class="drug-header dolutegravir">Dolutegravir</div>
+                    <div class="drug-header darunavir">Darunavir</div>
+                    <div class="drug-header oseltamivir">Oseltamivir</div>
+                    <div class="drug-header ribavirin">Ribavirin</div>
+                </div>
+
+                <div id="game-grid" class="game-grid">
+                    <!-- Grid will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="word-bank-container">
+                <div class="draggable-items">
+                    <div class="word-bank-title">📋 Word Bank</div>
+                    
+                    <div class="instant-feedback-toggle">
+                        <label for="instant-feedback">Instant Feedback</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="instant-feedback" checked onchange="toggleInstantFeedback()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="word-bank-tabs">
+                        <button class="tab-btn active" onclick="filterItems('all')">All</button>
+                        <button class="tab-btn" onclick="filterItems('Drug Class')">Class</button>
+                        <button class="tab-btn" onclick="filterItems('Mechanism of Action')">MOA</button>
+                        <button class="tab-btn" onclick="filterItems('Indications/Use')">Use</button>
+                        <button class="tab-btn" onclick="filterItems('Adverse Effects')">ADRs</button>
+                        <button class="tab-btn" onclick="filterItems('Special Considerations')">Notes</button>
+                    </div>
+                    <div id="items-grid" class="items-grid">
+                        <!-- Draggable items will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback-modal">
+        <div class="feedback-content">
+            <h2>🎉 Results</h2>
+            <div id="feedback-score" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = ['Drug Class', 'Mechanism of Action', 'Indications/Use', 'Adverse Effects', 'Special Considerations'];
+        const drugs = ['Acyclovir', 'Ganciclovir', 'Foscarnet', 'Tenofovir', 'Efavirenz', 'Dolutegravir', 'Darunavir', 'Oseltamivir', 'Ribavirin'];
+
+        const correctAnswers = {
+            'Drug Class': {
+                'Acyclovir': 'Guanosine analog (antiherpetic)',
+                'Ganciclovir': 'Guanosine analog (antiherpetic)',
+                'Foscarnet': 'Viral DNA polymerase inhibitor (pyrophosphate analog)',
+                'Tenofovir': 'Nucleotide reverse transcriptase inhibitor (NRTI)',
+                'Efavirenz': 'Non-nucleoside reverse transcriptase inhibitor (NNRTI)',
+                'Dolutegravir': 'Integrase strand transfer inhibitor (INSTI)',
+                'Darunavir': 'Protease inhibitor (PI)',
+                'Oseltamivir': 'Neuraminidase inhibitor',
+                'Ribavirin': 'Guanosine nucleotide analog (broad-spectrum antiviral)'
+            },
+            'Mechanism of Action': {
+                'Acyclovir': 'Inhibits viral DNA synthesis; requires viral thymidine kinase activation',
+                'Ganciclovir': 'Inhibits viral DNA polymerase; activated by UL97 phosphotransferase',
+                'Foscarnet': 'Noncompetitive inhibitor of viral DNA/RNA polymerase; no activation needed',
+                'Tenofovir': 'Nucleotide analog; chain terminator of reverse transcriptase',
+                'Efavirenz': 'Binds directly to reverse transcriptase; inactivates enzyme',
+                'Dolutegravir': 'Inhibits integrase; prevents viral DNA integration into host genome',
+                'Darunavir': 'Blocks viral protease from cutting polyproteins into functional units',
+                'Oseltamivir': 'Blocks neuraminidase; prevents viral release from infected cells',
+                'Ribavirin': 'Inhibits viral RNA polymerase; mimics purine structure'
+            },
+            'Indications/Use': {
+                'Acyclovir': 'HSV-1, HSV-2, VZV (chickenpox, shingles); oral or IV',
+                'Ganciclovir': 'CMV in immunocompromised; acyclovir-resistant HSV',
+                'Foscarnet': 'CMV retinitis in AIDS; ganciclovir-resistant CMV; acyclovir-resistant HSV',
+                'Tenofovir': 'HIV treatment; part of HAART regimen with other NRTIs',
+                'Efavirenz': 'HIV treatment; combined with NRTIs; may cause CNS effects',
+                'Dolutegravir': 'HIV treatment; first-line with 2 NRTIs; high barrier to resistance',
+                'Darunavir': 'HIV treatment; used with ritonavir boosting; for resistant strains',
+                'Oseltamivir': 'Influenza A and B; must start within 48 hours of symptoms',
+                'Ribavirin': 'Severe RSV in immunocompromised; hepatitis C (with interferon)'
+            },
+            'Adverse Effects': {
+                'Acyclovir': 'Renal impairment (crystal nephropathy); increased seizure risk; elevated liver enzymes',
+                'Ganciclovir': 'Myelosuppression (leukopenia, thrombocytopenia, anemia)',
+                'Foscarnet': 'Severe renal impairment; electrolyte imbalances (hypokalemia, hypocalcemia)',
+                'Tenofovir': 'Renal injury; bone loss; use TAF formulation to reduce toxicity',
+                'Efavirenz': 'CNS toxicity (vivid dreams, dizziness); QT prolongation; elevated liver enzymes',
+                'Dolutegravir': 'Generally well tolerated; may worsen depression/psychiatric illness',
+                'Darunavir': 'Severe rash and fever; elevated liver enzymes; requires boosting',
+                'Oseltamivir': 'Headache; nausea and vomiting; generally well tolerated',
+                'Ribavirin': 'Hemolytic anemia (black box warning); teratogenic (Category X)'
+            },
+            'Special Considerations': {
+                'Acyclovir': 'Maintain hydration to prevent nephrotoxicity; valacyclovir is prodrug with better absorption',
+                'Ganciclovir': 'Avoid with tenofovir (compete for renal excretion); monitor blood counts',
+                'Foscarnet': 'Aggressive pre-hydration required; no viral kinase activation needed',
+                'Tenofovir': 'TAF preferred over TDF; used in PrEP and PEP regimens',
+                'Efavirenz': 'CYP450 inducer; may decrease levels of other drugs; avoid in pregnancy',
+                'Dolutegravir': 'Minimal drug interactions; pregnancy safe if already taking',
+                'Darunavir': 'Requires ritonavir or cobicistat boosting; avoid in sulfa allergy',
+                'Oseltamivir': 'Effective only within 48 hours; used for high-risk patients',
+                'Ribavirin': 'Contraindicated in pregnancy; caution with cardiac disease; monitor for anemia'
+            }
+        };
+
+        let gameState = {};
+        let stats = { correct: 0, total: 0 };
+        let instantFeedbackEnabled = true;
+
+        function toggleInstantFeedback() {
+            instantFeedbackEnabled = document.getElementById('instant-feedback').checked;
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+            });
+            
+            if (instantFeedbackEnabled) {
+                let correct = 0;
+                let total = 0;
+                
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    const item = zone.querySelector('.item-in-zone');
+                    if (item) {
+                        total++;
+                        const isCorrect = zone.dataset.category === item.dataset.category &&
+                                        zone.dataset.drug === item.dataset.drug;
+                        if (isCorrect) {
+                            correct++;
+                            zone.classList.add('correct');
+                        }
+                    }
+                });
+                
+                stats.correct = correct;
+                stats.total = total;
+                updateStats();
+            } else {
+                stats.correct = 0;
+                stats.total = 0;
+                updateStats();
+            }
+        }
+
+        function initializeGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'row-label';
+                rowLabel.textContent = category;
+                grid.appendChild(rowLabel);
+
+                drugs.forEach(drug => {
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.drug = drug;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    grid.appendChild(dropZone);
+
+                    const key = `${category}-${drug}`;
+                    gameState[key] = null;
+                });
+            });
+
+            createDraggableItems();
+            updateStats();
+        }
+
+        function createDraggableItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            const allItems = [];
+            
+            Object.keys(correctAnswers).forEach(category => {
+                Object.keys(correctAnswers[category]).forEach(drug => {
+                    allItems.push({
+                        category,
+                        drug,
+                        text: correctAnswers[category][drug]
+                    });
+                });
+            });
+
+            allItems.sort(() => Math.random() - 0.5);
+
+            const activeTab = document.querySelector('.tab-btn.active');
+            let activeFilter = 'all';
+            if (activeTab) {
+                const activeText = activeTab.textContent;
+                const categoryMap = {
+                    'All': 'all',
+                    'Class': 'Drug Class',
+                    'MOA': 'Mechanism of Action',
+                    'Use': 'Indications/Use',
+                    'ADRs': 'Adverse Effects',
+                    'Notes': 'Special Considerations'
+                };
+                activeFilter = categoryMap[activeText] || 'all';
+            }
+
+            allItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.category = item.category;
+                div.dataset.drug = item.drug;
+                div.dataset.id = index;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                if (activeFilter !== 'all' && item.category !== activeFilter) {
+                    div.classList.add('hidden');
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.textContent);
+            e.dataTransfer.setData('category', e.target.dataset.category);
+            e.dataTransfer.setData('drug', e.target.dataset.drug);
+            e.dataTransfer.setData('itemId', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const category = e.dataTransfer.getData('category');
+            const drug = e.dataTransfer.getData('drug');
+            const itemId = e.dataTransfer.getData('itemId');
+            const text = e.dataTransfer.getData('text/html');
+
+            const dropZone = e.currentTarget;
+            
+            dropZone.classList.remove('incorrect', 'correct');
+
+            if (dropZone.children.length > 0) {
+                const oldItem = dropZone.querySelector('.item-in-zone');
+                if (oldItem) {
+                    returnItemToPool(oldItem);
+                }
+            }
+
+            const isCorrect = dropZone.dataset.category === category && 
+                            dropZone.dataset.drug === drug;
+
+            if (instantFeedbackEnabled) {
+                if (!isCorrect) {
+                    dropZone.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        dropZone.classList.remove('incorrect');
+                        
+                        const originalItem = document.querySelector(`.draggable-item[data-id="${itemId}"]`);
+                        if (!originalItem) {
+                            const container = document.getElementById('items-grid');
+                            const div = document.createElement('div');
+                            div.className = 'draggable-item';
+                            div.draggable = true;
+                            div.textContent = text;
+                            div.dataset.category = category;
+                            div.dataset.drug = drug;
+                            div.dataset.id = itemId;
+
+                            div.addEventListener('dragstart', handleDragStart);
+                            div.addEventListener('dragend', handleDragEnd);
+
+                            const activeTab = document.querySelector('.tab-btn.active');
+                            if (activeTab) {
+                                const activeText = activeTab.textContent;
+                                const categoryMap = {
+                                    'Class': 'Drug Class',
+                                    'MOA': 'Mechanism of Action',
+                                    'Use': 'Indications/Use',
+                                    'ADRs': 'Adverse Effects',
+                                    'Notes': 'Special Considerations'
+                                };
+                                const filterCategory = categoryMap[activeText];
+                                if (filterCategory && category !== filterCategory) {
+                                    div.classList.add('hidden');
+                                }
+                            }
+
+                            container.appendChild(div);
+                        }
+                    }, 500);
+                    
+                    return;
+                } else {
+                    dropZone.classList.add('correct');
+                    stats.correct++;
+                    stats.total++;
+                }
+            }
+
+            dropZone.innerHTML = '';
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-in-zone';
+            itemDiv.textContent = text;
+            itemDiv.dataset.category = category;
+            itemDiv.dataset.drug = drug;
+            itemDiv.dataset.itemId = itemId;
+            dropZone.appendChild(itemDiv);
+
+            const originalItem = document.querySelector(`[data-id="${itemId}"]`);
+            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+                originalItem.remove();
+            }
+
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.drug}`;
+            gameState[key] = { category, drug, itemId };
+            
+            if (instantFeedbackEnabled) {
+                updateStats();
+            }
+        }
+
+        function returnItemToPool(item) {
+            const container = document.getElementById('items-grid');
+            
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.textContent = item.textContent;
+            div.dataset.category = item.dataset.category;
+            div.dataset.drug = item.dataset.drug;
+            div.dataset.id = item.dataset.itemId;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(div);
+            
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const activeFilter = activeTab.textContent;
+                const categoryMap = {
+                    'Class': 'Drug Class',
+                    'MOA': 'Mechanism of Action',
+                    'Use': 'Indications/Use',
+                    'ADRs': 'Adverse Effects',
+                    'Notes': 'Special Considerations'
+                };
+                const filterCategory = categoryMap[activeFilter];
+                if (filterCategory && div.dataset.category !== filterCategory) {
+                    div.classList.add('hidden');
+                }
+            }
+        }
+
+        function checkAnswers() {
+            if (instantFeedbackEnabled) {
+                const total = stats.total;
+                const correct = stats.correct;
+                if (total > 0) {
+                    showFeedback(correct, total);
+                }
+                return;
+            }
+
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.drug === item.dataset.drug;
+                    
+                    if (isCorrect) {
+                        correct++;
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
+
+            if (total > 0) {
+                showFeedback(correct, total);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('total-count').textContent = stats.total;
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showFeedback(correct, total) {
+            const feedback = document.getElementById('feedback');
+            const scoreDiv = document.getElementById('feedback-score');
+            const percentage = Math.round((correct / total) * 100);
+
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 Perfect Score!';
+            } else if (percentage >= 80) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Effort!';
+            } else {
+                message = '📚 Keep Studying!';
+            }
+
+            feedback.querySelector('h2').textContent = message;
+            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            feedback.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function resetGame() {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.remove('correct', 'incorrect');
+            });
+
+            gameState = {};
+            stats = { correct: 0, total: 0 };
+            updateStats();
+
+            createDraggableItems();
+            
+            filterItems('all');
+            
+            closeFeedback();
+        }
+
+        function filterItems(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'All') ||
+                    (category === 'Drug Class' && btn.textContent === 'Class') ||
+                    (category === 'Mechanism of Action' && btn.textContent === 'MOA') ||
+                    (category === 'Indications/Use' && btn.textContent === 'Use') ||
+                    (category === 'Adverse Effects' && btn.textContent === 'ADRs') ||
+                    (category === 'Special Considerations' && btn.textContent === 'Notes')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const items = document.querySelectorAll('.draggable-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
