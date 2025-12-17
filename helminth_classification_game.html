@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helminth Classification Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d97706;
+            --secondary: #059669;
+            --accent: #dc2626;
+            --bg-main: #fef3c7;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #78716c;
+            --border: #e7e5e4;
+            --success: #10b981;
+            --error: #ef4444;
+            --taenia-saginata: #ea580c;
+            --taenia-solium: #dc2626;
+            --diphyllobothrium: #0891b2;
+            --strongyloides: #8b5cf6;
+            --ancylostoma: #ec4899;
+            --ascaris: #f59e0b;
+            --enterobius: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .word-bank-container {
+            width: 360px;
+            flex-shrink: 0;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 220px repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-header {
+            background: var(--bg-main);
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid var(--border);
+        }
+
+        .category-header:first-child {
+            background: transparent;
+            border: none;
+        }
+
+        .organism-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            line-height: 1.3;
+        }
+
+        .organism-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .organism-header span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .taenia-saginata { background: var(--taenia-saginata); }
+        .taenia-solium { background: var(--taenia-solium); }
+        .diphyllobothrium-latum { background: var(--diphyllobothrium); }
+        .strongyloides-stercoralis { background: var(--strongyloides); }
+        .ancylostoma-necator { background: var(--ancylostoma); }
+        .ascaris-lumbricoides { background: var(--ascaris); }
+        .enterobius-vermicularis { background: var(--enterobius); }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 220px repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            min-height: 120px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone.drag-over {
+            background: #fef3c7;
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+        }
+
+        .drop-zone.correct {
+            background: #f0fdf4;
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .drop-zone.incorrect {
+            background: #fef2f2;
+            border-color: var(--error);
+            border-style: solid;
+            animation: shake 0.4s ease;
+        }
+
+        .draggable-items {
+            background: var(--bg-main);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            min-height: 600px;
+            max-height: 800px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .word-bank-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .instant-feedback-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .instant-feedback-toggle label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .word-bank-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.6rem 0.75rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-main);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: move;
+            user-select: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .draggable-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-item.hidden {
+            display: none;
+        }
+
+        .item-in-zone {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #b45309);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #047857);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .feedback-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feedback-score {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .close-btn:hover {
+            background: #b45309;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .draggable-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .draggable-items::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .draggable-items::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1600px) {
+            .grid-header, .game-grid {
+                grid-template-columns: 200px repeat(3, 1fr);
+            }
+            .word-bank-container {
+                width: 340px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-board {
+                flex-direction: column;
+            }
+            .word-bank-container {
+                width: 100%;
+            }
+            .draggable-items {
+                min-height: auto;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-header, .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .category-header:first-child,
+            .organism-header {
+                display: none;
+            }
+            .category-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🪱 Helminth Classification Challenge</h1>
+            <p class="subtitle">Match transmission, clinical features, and laboratory findings</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid-container">
+                <div class="grid-header">
+                    <div class="category-header"></div>
+                    <div class="category-header">Transmission/Life Cycle</div>
+                    <div class="category-header">Clinical Presentation</div>
+                    <div class="category-header">Laboratory Diagnosis</div>
+                </div>
+
+                <div id="game-grid" class="game-grid">
+                    <!-- Grid will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="word-bank-container">
+                <div class="draggable-items">
+                    <div class="word-bank-title">📋 Word Bank</div>
+                    
+                    <div class="instant-feedback-toggle">
+                        <label for="instant-feedback">Instant Feedback</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="instant-feedback" checked onchange="toggleInstantFeedback()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="word-bank-tabs">
+                        <button class="tab-btn active" onclick="filterItems('all')">All</button>
+                        <button class="tab-btn" onclick="filterItems('Transmission/Life Cycle')">Transmission</button>
+                        <button class="tab-btn" onclick="filterItems('Clinical Presentation')">Clinical</button>
+                        <button class="tab-btn" onclick="filterItems('Laboratory Diagnosis')">Lab</button>
+                    </div>
+                    <div id="items-grid" class="items-grid">
+                        <!-- Draggable items will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+            <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback-modal">
+        <div class="feedback-content">
+            <h2>🎉 Results</h2>
+            <div id="feedback-score" class="feedback-score"></div>
+            <button class="close-btn" onclick="closeFeedback()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = ['Transmission/Life Cycle', 'Clinical Presentation', 'Laboratory Diagnosis'];
+        const organisms = ['Taenia saginata', 'Taenia solium', 'Diphyllobothrium latum', 'Strongyloides stercoralis', 'Ancylostoma/Necator', 'Ascaris lumbricoides', 'Enterobius vermicularis'];
+
+        const correctAnswers = {
+            'Transmission/Life Cycle': {
+                'Taenia saginata': 'Eating undercooked beef with cysticerci; humans are definitive host',
+                'Taenia solium': 'Eating undercooked pork; autoinfection from eggs causes cysticercosis',
+                'Diphyllobothrium latum': 'Eating raw/undercooked fish (plerocercoid form); largest tapeworm',
+                'Strongyloides stercoralis': 'Filariform larvae penetrate skin; autoinfection possible (lifelong)',
+                'Ancylostoma/Necator': 'Filariform larvae penetrate skin; no autoinfection occurs',
+                'Ascaris lumbricoides': 'Fecal-oral (embryonated eggs); cannot penetrate skin; giant roundworm',
+                'Enterobius vermicularis': 'Fecal-oral transmission; eggs laid around anus at night cause itching'
+            },
+            'Clinical Presentation': {
+                'Taenia saginata': 'Usually asymptomatic; passes proglottids in stool; mild GI symptoms',
+                'Taenia solium': 'Neurocysticercosis: seizures, calcified brain lesions (most common adult seizures in endemic areas)',
+                'Diphyllobothrium latum': 'Usually asymptomatic; can cause vitamin B12 deficiency; >10m long',
+                'Strongyloides stercoralis': 'Larva currens rash; hyperinfection syndrome in immunocompromised (90% mortality)',
+                'Ancylostoma/Necator': 'Cutaneous larva migrans (itchy, serpiginous); iron-deficiency anemia',
+                'Ascaris lumbricoides': 'Usually asymptomatic; intestinal obstruction with high burden',
+                'Enterobius vermicularis': 'Intense perianal itching at night; mostly affects children <10'
+            },
+            'Laboratory Diagnosis': {
+                'Taenia saginata': 'Round, striated eggs; scolex has 4 suckers, no hooks; 12-30 uterine branches',
+                'Taenia solium': 'Round, striated eggs; scolex has hooks and rostellum; 7-13 uterine branches',
+                'Diphyllobothrium latum': 'Oval eggs with operculum; rosette-shaped uterus in proglottids',
+                'Strongyloides stercoralis': 'Rhabditiform larvae in stool; females only (no males in intestines)',
+                'Ancylostoma/Necator': 'Eggs with smooth shell and nodular interior (embryo visible)',
+                'Ascaris lumbricoides': 'Fertilized (smooth, round) or unfertilized (mammillated/bumpy) eggs',
+                'Enterobius vermicularis': 'Scotch tape test for perianal eggs; transparent, elongated, flat on one side'
+            }
+        };
+
+        let gameState = {};
+        let stats = { correct: 0, total: 0 };
+        let instantFeedbackEnabled = true;
+
+        function toggleInstantFeedback() {
+            instantFeedbackEnabled = document.getElementById('instant-feedback').checked;
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+            });
+            
+            if (instantFeedbackEnabled) {
+                let correct = 0;
+                let total = 0;
+                
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    const item = zone.querySelector('.item-in-zone');
+                    if (item) {
+                        total++;
+                        const isCorrect = zone.dataset.category === item.dataset.category &&
+                                        zone.dataset.organism === item.dataset.organism;
+                        if (isCorrect) {
+                            correct++;
+                            zone.classList.add('correct');
+                        }
+                    }
+                });
+                
+                stats.correct = correct;
+                stats.total = total;
+                updateStats();
+            } else {
+                stats.correct = 0;
+                stats.total = 0;
+                updateStats();
+            }
+        }
+
+        function initializeGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            organisms.forEach(organism => {
+                const organismLabel = document.createElement('div');
+                organismLabel.className = 'organism-header ' + organism.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-');
+                const span = document.createElement('span');
+                span.textContent = organism;
+                organismLabel.appendChild(span);
+                grid.appendChild(organismLabel);
+
+                categories.forEach(category => {
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.organism = organism;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    grid.appendChild(dropZone);
+
+                    const key = `${category}-${organism}`;
+                    gameState[key] = null;
+                });
+            });
+
+            createDraggableItems();
+            updateStats();
+        }
+
+        function createDraggableItems() {
+            const container = document.getElementById('items-grid');
+            container.innerHTML = '';
+
+            const allItems = [];
+            
+            Object.keys(correctAnswers).forEach(category => {
+                Object.keys(correctAnswers[category]).forEach(organism => {
+                    allItems.push({
+                        category,
+                        organism,
+                        text: correctAnswers[category][organism]
+                    });
+                });
+            });
+
+            allItems.sort(() => Math.random() - 0.5);
+
+            const activeTab = document.querySelector('.tab-btn.active');
+            let activeFilter = 'all';
+            if (activeTab) {
+                const activeText = activeTab.textContent;
+                const categoryMap = {
+                    'All': 'all',
+                    'Transmission': 'Transmission/Life Cycle',
+                    'Clinical': 'Clinical Presentation',
+                    'Lab': 'Laboratory Diagnosis'
+                };
+                activeFilter = categoryMap[activeText] || 'all';
+            }
+
+            allItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'draggable-item';
+                div.draggable = true;
+                div.textContent = item.text;
+                div.dataset.category = item.category;
+                div.dataset.organism = item.organism;
+                div.dataset.id = index;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                if (activeFilter !== 'all' && item.category !== activeFilter) {
+                    div.classList.add('hidden');
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.textContent);
+            e.dataTransfer.setData('category', e.target.dataset.category);
+            e.dataTransfer.setData('organism', e.target.dataset.organism);
+            e.dataTransfer.setData('itemId', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const category = e.dataTransfer.getData('category');
+            const organism = e.dataTransfer.getData('organism');
+            const itemId = e.dataTransfer.getData('itemId');
+            const text = e.dataTransfer.getData('text/html');
+
+            const dropZone = e.currentTarget;
+            
+            dropZone.classList.remove('incorrect', 'correct');
+
+            if (dropZone.children.length > 0) {
+                const oldItem = dropZone.querySelector('.item-in-zone');
+                if (oldItem) {
+                    returnItemToPool(oldItem);
+                }
+            }
+
+            const isCorrect = dropZone.dataset.category === category && 
+                            dropZone.dataset.organism === organism;
+
+            if (instantFeedbackEnabled) {
+                if (!isCorrect) {
+                    dropZone.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        dropZone.classList.remove('incorrect');
+                        
+                        const originalItem = document.querySelector(`.draggable-item[data-id="${itemId}"]`);
+                        if (!originalItem) {
+                            const container = document.getElementById('items-grid');
+                            const div = document.createElement('div');
+                            div.className = 'draggable-item';
+                            div.draggable = true;
+                            div.textContent = text;
+                            div.dataset.category = category;
+                            div.dataset.organism = organism;
+                            div.dataset.id = itemId;
+
+                            div.addEventListener('dragstart', handleDragStart);
+                            div.addEventListener('dragend', handleDragEnd);
+
+                            const activeTab = document.querySelector('.tab-btn.active');
+                            if (activeTab) {
+                                const activeText = activeTab.textContent;
+                                const categoryMap = {
+                                    'Transmission': 'Transmission/Life Cycle',
+                                    'Clinical': 'Clinical Presentation',
+                                    'Lab': 'Laboratory Diagnosis'
+                                };
+                                const filterCategory = categoryMap[activeText];
+                                if (filterCategory && category !== filterCategory) {
+                                    div.classList.add('hidden');
+                                }
+                            }
+
+                            container.appendChild(div);
+                        }
+                    }, 500);
+                    
+                    return;
+                } else {
+                    dropZone.classList.add('correct');
+                    stats.correct++;
+                    stats.total++;
+                }
+            }
+
+            dropZone.innerHTML = '';
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-in-zone';
+            itemDiv.textContent = text;
+            itemDiv.dataset.category = category;
+            itemDiv.dataset.organism = organism;
+            itemDiv.dataset.itemId = itemId;
+            dropZone.appendChild(itemDiv);
+
+            const originalItem = document.querySelector(`[data-id="${itemId}"]`);
+            if (originalItem && originalItem.parentElement.id === 'items-grid') {
+                originalItem.remove();
+            }
+
+            const key = `${dropZone.dataset.category}-${dropZone.dataset.organism}`;
+            gameState[key] = { category, organism, itemId };
+            
+            if (instantFeedbackEnabled) {
+                updateStats();
+            }
+        }
+
+        function returnItemToPool(item) {
+            const container = document.getElementById('items-grid');
+            
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.textContent = item.textContent;
+            div.dataset.category = item.dataset.category;
+            div.dataset.organism = item.dataset.organism;
+            div.dataset.id = item.dataset.itemId;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(div);
+            
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const activeFilter = activeTab.textContent;
+                const categoryMap = {
+                    'Transmission': 'Transmission/Life Cycle',
+                    'Clinical': 'Clinical Presentation',
+                    'Lab': 'Laboratory Diagnosis'
+                };
+                const filterCategory = categoryMap[activeFilter];
+                if (filterCategory && div.dataset.category !== filterCategory) {
+                    div.classList.add('hidden');
+                }
+            }
+        }
+
+        function checkAnswers() {
+            if (instantFeedbackEnabled) {
+                const total = stats.total;
+                const correct = stats.correct;
+                if (total > 0) {
+                    showFeedback(correct, total);
+                }
+                return;
+            }
+
+            let correct = 0;
+            let total = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const item = zone.querySelector('.item-in-zone');
+                if (item) {
+                    total++;
+                    const isCorrect = zone.dataset.category === item.dataset.category &&
+                                    zone.dataset.organism === item.dataset.organism;
+                    
+                    if (isCorrect) {
+                        correct++;
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                }
+            });
+
+            stats.correct = correct;
+            stats.total = total;
+            updateStats();
+
+            if (total > 0) {
+                showFeedback(correct, total);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('total-count').textContent = stats.total;
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showFeedback(correct, total) {
+            const feedback = document.getElementById('feedback');
+            const scoreDiv = document.getElementById('feedback-score');
+            const percentage = Math.round((correct / total) * 100);
+
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 Perfect Score!';
+            } else if (percentage >= 80) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Effort!';
+            } else {
+                message = '📚 Keep Studying!';
+            }
+
+            feedback.querySelector('h2').textContent = message;
+            scoreDiv.textContent = `You got ${correct} out of ${total} correct (${percentage}%)`;
+            feedback.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function resetGame() {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.remove('correct', 'incorrect');
+            });
+
+            gameState = {};
+            stats = { correct: 0, total: 0 };
+            updateStats();
+
+            createDraggableItems();
+            
+            filterItems('all');
+            
+            closeFeedback();
+        }
+
+        function filterItems(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'All') ||
+                    (category === 'Transmission/Life Cycle' && btn.textContent === 'Transmission') ||
+                    (category === 'Clinical Presentation' && btn.textContent === 'Clinical') ||
+                    (category === 'Laboratory Diagnosis' && btn.textContent === 'Lab')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const items = document.querySelectorAll('.draggable-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
