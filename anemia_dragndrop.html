@@ -193,7 +193,7 @@
             position: relative;
         }
 
-        .word-item[data-category="MCV Classification"]::after {
+        .word-item.reusable::after {
             content: "♻️";
             position: absolute;
             top: 2px;
@@ -489,7 +489,7 @@
 
         <div class="word-bank-container">
             <div class="word-bank-title">📝 Word Bank</div>
-            <div class="reusable-note">♻️ MCV Classification words are reusable!</div>
+            <div class="reusable-note">♻️ Words with ♻️ are reusable!</div>
             <div class="tabs-container">
                 <div class="tab-buttons" id="tabButtons"></div>
                 <div id="tabContents"></div>
@@ -521,6 +521,30 @@
             'AIHA',
             'Megaloblastic'
         ];
+
+        // Function to find all reusable words (appear in multiple places)
+        function findReusableWords() {
+            const wordCount = {};
+            
+            // Count occurrences of each word across all categories and diseases
+            Object.keys(answers).forEach(category => {
+                Object.keys(answers[category]).forEach(disease => {
+                    answers[category][disease].forEach(word => {
+                        if (!wordCount[word]) {
+                            wordCount[word] = 0;
+                        }
+                        wordCount[word]++;
+                    });
+                });
+            });
+            
+            // Return words that appear more than once
+            return new Set(
+                Object.keys(wordCount).filter(word => wordCount[word] > 1)
+            );
+        }
+
+        const reusableWords = findReusableWords();
 
         const answers = {
             'MCV Classification': {
@@ -645,6 +669,13 @@
                 sortedWords.forEach(word => {
                     const wordItem = document.createElement('div');
                     wordItem.className = 'word-item';
+                    
+                    // Add reusable class if word is from MCV Classification or appears multiple times
+                    const isReusable = category === 'MCV Classification' || reusableWords.has(word);
+                    if (isReusable) {
+                        wordItem.classList.add('reusable');
+                    }
+                    
                     wordItem.draggable = true;
                     wordItem.textContent = word;
                     wordItem.dataset.word = word;
@@ -775,8 +806,9 @@
             
             dropZone.appendChild(droppedItem);
             
-            // Only remove from word bank if NOT from MCV Classification category
-            if (wordCategory !== 'MCV Classification') {
+            // Only remove from word bank if NOT reusable (MCV Classification OR appears multiple times)
+            const isReusable = wordCategory === 'MCV Classification' || reusableWords.has(word);
+            if (!isReusable) {
                 draggedElement.remove();
             }
             
@@ -791,8 +823,9 @@
             const word = item.dataset.word;
             const category = item.dataset.category;
             
-            // Only add back to word bank if NOT from MCV Classification category
-            if (category !== 'MCV Classification') {
+            // Only add back to word bank if NOT reusable (MCV Classification OR appears multiple times)
+            const isReusable = category === 'MCV Classification' || reusableWords.has(word);
+            if (!isReusable) {
                 // Find the correct tab for this word based on the category it was placed in
                 const categoryIndex = categories.indexOf(category);
                 const targetTab = document.getElementById(`tab-${categoryIndex}`);
