@@ -522,30 +522,6 @@
             'Megaloblastic'
         ];
 
-        // Function to find all reusable words (appear in multiple places)
-        function findReusableWords() {
-            const wordCount = {};
-            
-            // Count occurrences of each word across all categories and diseases
-            Object.keys(answers).forEach(category => {
-                Object.keys(answers[category]).forEach(disease => {
-                    answers[category][disease].forEach(word => {
-                        if (!wordCount[word]) {
-                            wordCount[word] = 0;
-                        }
-                        wordCount[word]++;
-                    });
-                });
-            });
-            
-            // Return words that appear more than once
-            return new Set(
-                Object.keys(wordCount).filter(word => wordCount[word] > 1)
-            );
-        }
-
-        const reusableWords = findReusableWords();
-
         const answers = {
             'MCV Classification': {
                 'G6PD': ['Normocytic'],
@@ -632,6 +608,30 @@
                 'Megaloblastic': ['Neurologic symptoms (B12)', 'Glossitis', 'Psychiatric changes', 'Hypersegmented neutrophils pathognomonic']
             }
         };
+
+        // Function to find all reusable words (appear in multiple places)
+        function findReusableWords() {
+            const wordCount = {};
+            
+            // Count occurrences of each word across all categories and diseases
+            Object.keys(answers).forEach(category => {
+                Object.keys(answers[category]).forEach(disease => {
+                    answers[category][disease].forEach(word => {
+                        if (!wordCount[word]) {
+                            wordCount[word] = 0;
+                        }
+                        wordCount[word]++;
+                    });
+                });
+            });
+            
+            // Return words that appear more than once
+            return new Set(
+                Object.keys(wordCount).filter(word => wordCount[word] > 1)
+            );
+        }
+
+        const reusableWords = findReusableWords();
 
         // Create word bank items organized by tabs
         function createWordBank() {
