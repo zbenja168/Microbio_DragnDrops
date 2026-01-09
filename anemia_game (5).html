@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anemia Classification Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            gap: 0;
+        }
+
+        .content-section {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #64ffda;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+        }
+
+        .word-bank-container {
+            position: sticky;
+            top: 0;
+            right: 0;
+            width: 320px;
+            background: #0f3460;
+            padding: 0;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+            height: 100vh;
+            overflow: hidden;
+            border-left: 3px solid #64ffda;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .word-bank-title {
+            color: #64ffda;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+            border-bottom: 2px solid #64ffda;
+        }
+
+        .reusable-note {
+            background: rgba(100, 255, 218, 0.1);
+            color: #64ffda;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            text-align: center;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+        }
+
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            background: #16213e;
+            border-bottom: 2px solid #64ffda;
+        }
+
+        .tab-button {
+            padding: 12px 15px;
+            background: #16213e;
+            color: #64ffda;
+            border: none;
+            border-bottom: 1px solid #2d3561;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #1a2a4e;
+            padding-left: 20px;
+        }
+
+        .tab-button.active {
+            background: #0f3460;
+            color: #64ffda;
+            border-left: 4px solid #64ffda;
+            font-weight: bold;
+            box-shadow: inset 0 0 10px rgba(100, 255, 218, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+            padding-right: 10px;
+            flex: 1;
+            overflow-y: scroll !important;
+            overflow-x: hidden;
+            max-height: calc(100vh - 220px);
+            scrollbar-width: thin;
+            scrollbar-color: #64ffda #16213e;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-content::-webkit-scrollbar {
+            width: 12px;
+            display: block !important;
+        }
+
+        .tab-content::-webkit-scrollbar-track {
+            background: #16213e;
+            border-radius: 6px;
+            border: 1px solid #2d3561;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb {
+            background: #64ffda;
+            border-radius: 6px;
+            border: 2px solid #16213e;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb:hover {
+            background: #52d4c2;
+        }
+
+        /* Force scrollbar to always show */
+        .tab-content::-webkit-scrollbar-thumb {
+            min-height: 50px;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .word-item {
+            background: #1a1a2e;
+            color: #64ffda;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: move;
+            border: 2px solid #64ffda;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(100, 255, 218, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .word-item[data-category="MCV Classification"]::after {
+            content: "♻️";
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            font-size: 0.7em;
+        }
+
+        .word-item:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.4);
+            background: #16213e;
+        }
+
+        .word-item.dragging {
+            opacity: 0.5;
+        }
+
+        .game-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #16213e;
+        }
+
+        .game-table th {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: #64ffda;
+            padding: 15px 8px;
+            font-size: 0.85em;
+            border: 2px solid #0f3460;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .game-table td {
+            border: 2px solid #2d3561;
+            padding: 8px;
+            text-align: center;
+            min-height: 60px;
+            vertical-align: top;
+            background: #1a1a2e;
+        }
+
+        .category-cell {
+            background: #0f3460;
+            font-weight: bold;
+            color: #64ffda;
+            text-align: left;
+            padding-left: 15px;
+            font-size: 0.95em;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        .drop-zone {
+            min-height: 80px;
+            background: #16213e;
+            border: 2px dashed #2d3561;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: flex-start;
+            align-content: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover {
+            background: #1a2a4e;
+            border-color: #64ffda;
+        }
+
+        .drop-zone.drag-over {
+            background: #1a2a4e;
+            border-color: #64ffda;
+            border-style: solid;
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .dropped-item {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: #64ffda;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(100, 255, 218, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #64ffda;
+        }
+
+        .dropped-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.4);
+        }
+
+        .dropped-item.correct {
+            background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+            color: white;
+            border-color: #1ed760;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .dropped-item.incorrect {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border-color: #c0392b;
+            animation: incorrectShake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .remove-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.2);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-reveal {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+
+        .score {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3em;
+            color: #64ffda;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2em;
+            min-height: 30px;
+            font-weight: 600;
+        }
+
+        .feedback.correct {
+            color: #1ed760;
+            text-shadow: 0 0 10px rgba(30, 215, 96, 0.5);
+        }
+
+        .feedback.incorrect {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 1400px) {
+            .game-table th,
+            .game-table td {
+                font-size: 0.75em;
+                padding: 6px 4px;
+            }
+            
+            .word-item {
+                font-size: 0.8em;
+                padding: 6px 10px;
+            }
+
+            .word-bank-container {
+                width: 280px;
+            }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #16213e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #64ffda;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52d4c2;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content-section">
+            <div class="container">
+                <h1>🩺 Anemia Classification Challenge 🩸</h1>
+                
+                <div class="feedback" id="feedback"></div>
+                <div class="score" id="score">Score: 0/0</div>
+
+                <div class="table-wrapper">
+                    <table class="game-table">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 180px;">Category</th>
+                                <th style="min-width: 140px;">G6PD Deficiency</th>
+                                <th style="min-width: 140px;">Pyruvate Kinase Deficiency</th>
+                                <th style="min-width: 140px;">Methemoglobinemia</th>
+                                <th style="min-width: 140px;">Iron-Deficiency Anemia</th>
+                                <th style="min-width: 140px;">Thalassemias</th>
+                                <th style="min-width: 140px;">Anemia of Chronic Disease</th>
+                                <th style="min-width: 140px;">Sideroblastic Anemia</th>
+                                <th style="min-width: 140px;">Aplastic Anemia</th>
+                                <th style="min-width: 140px;">Hereditary Spherocytosis</th>
+                                <th style="min-width: 140px;">Sickle Cell Disease</th>
+                                <th style="min-width: 140px;">Autoimmune Hemolytic Anemia</th>
+                                <th style="min-width: 140px;">Megaloblastic Anemia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gameBoard"></tbody>
+                    </table>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-check" onclick="checkAnswers()">Check Answers</button>
+                    <button class="btn btn-reset" onclick="resetGame()">Reset Game</button>
+                    <button class="btn btn-reveal" onclick="revealAnswers()">Reveal Answers</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="word-bank-container">
+            <div class="word-bank-title">📝 Word Bank</div>
+            <div class="reusable-note">♻️ MCV Classification words are reusable!</div>
+            <div class="tabs-container">
+                <div class="tab-buttons" id="tabButtons"></div>
+                <div id="tabContents"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            'MCV Classification',
+            'Mechanism/Pathophysiology',
+            'Key Laboratory Findings',
+            'Peripheral Smear',
+            'Treatment',
+            'Clinical Features'
+        ];
+
+        const diseases = [
+            'G6PD',
+            'PK',
+            'Methemoglobin',
+            'IDA',
+            'Thalassemia',
+            'ACD',
+            'Sideroblastic',
+            'Aplastic',
+            'Spherocytosis',
+            'Sickle Cell',
+            'AIHA',
+            'Megaloblastic'
+        ];
+
+        const answers = {
+            'MCV Classification': {
+                'G6PD': ['Normocytic'],
+                'PK': ['Normocytic'],
+                'Methemoglobin': ['Normocytic'],
+                'IDA': ['Microcytic'],
+                'Thalassemia': ['Microcytic'],
+                'ACD': ['Normocytic (can be microcytic)'],
+                'Sideroblastic': ['Microcytic/Dimorphic'],
+                'Aplastic': ['Normocytic'],
+                'Spherocytosis': ['Normocytic'],
+                'Sickle Cell': ['Normocytic'],
+                'AIHA': ['Normocytic'],
+                'Megaloblastic': ['Macrocytic']
+            },
+            'Mechanism/Pathophysiology': {
+                'G6PD': ['Oxidative stress → hemolysis', 'Pentose phosphate pathway defect'],
+                'PK': ['Glycolysis defect', 'ATP depletion → hemolysis'],
+                'Methemoglobin': ['Fe2+ → Fe3+ oxidation', 'Cannot bind O2'],
+                'IDA': ['Insufficient iron', 'Impaired Hgb synthesis'],
+                'Thalassemia': ['Decreased globin synthesis', 'α or β chain reduction'],
+                'ACD': ['Hepcidin-mediated iron sequestration', 'Inflammation'],
+                'Sideroblastic': ['Defective heme synthesis', 'Mitochondrial iron accumulation'],
+                'Aplastic': ['Bone marrow failure', 'Stem cell destruction'],
+                'Spherocytosis': ['RBC membrane defect', 'Spectrin/ankyrin mutation'],
+                'Sickle Cell': ['HbS polymerization', 'Sickling with hypoxia'],
+                'AIHA': ['Antibody-mediated RBC destruction', 'Warm (IgG) or Cold (IgM)'],
+                'Megaloblastic': ['Impaired DNA synthesis', 'B12 or folate deficiency']
+            },
+            'Key Laboratory Findings': {
+                'G6PD': ['Heinz bodies', 'Normal MCV', 'Elevated reticulocytes during crisis'],
+                'PK': ['Elevated 2,3-BPG', 'Reticulocytosis', 'Elevated unconjugated bilirubin'],
+                'Methemoglobin': ['Elevated methemoglobin level', 'Chocolate-colored blood', 'Low SpO2, normal PaO2'],
+                'IDA': ['Low ferritin', 'Low iron, high TIBC', 'Low transferrin saturation'],
+                'Thalassemia': ['Normal/high ferritin', 'Elevated RBC count', 'Hemoglobin electrophoresis abnormal'],
+                'ACD': ['Low/normal iron, low TIBC', 'Normal/high ferritin', 'Low transferrin saturation'],
+                'Sideroblastic': ['Elevated iron & ferritin', 'Ringed sideroblasts (BM)', 'Elevated free erythrocyte protoporphyrin'],
+                'Aplastic': ['Pancytopenia', 'Low reticulocytes', 'Hypocellular bone marrow'],
+                'Spherocytosis': ['Elevated MCHC', 'Positive osmotic fragility', 'Negative Coombs'],
+                'Sickle Cell': ['HbS on electrophoresis', 'Positive sickle test', 'Howell-Jolly bodies'],
+                'AIHA': ['Positive direct Coombs (DAT)', 'Elevated LDH, low haptoglobin', 'Elevated indirect bilirubin'],
+                'Megaloblastic': ['MCV >100', 'Hypersegmented neutrophils', 'Low B12 or folate']
+            },
+            'Peripheral Smear': {
+                'G6PD': ['Bite cells', 'Heinz bodies (special stain)', 'Blister cells'],
+                'PK': ['Echinocytes (burr cells)', 'Polychromasia'],
+                'Methemoglobin': ['Normal RBC morphology'],
+                'IDA': ['Microcytic hypochromic RBCs', 'Pencil cells', 'Increased central pallor'],
+                'Thalassemia': ['Target cells', 'Basophilic stippling', 'Nucleated RBCs (if severe)'],
+                'ACD': ['Normocytic RBCs', 'No specific findings'],
+                'Sideroblastic': ['Dimorphic population', 'Basophilic stippling', 'Pappenheimer bodies'],
+                'Aplastic': ['Normocytic RBCs', 'Decreased all cell lines'],
+                'Spherocytosis': ['Spherocytes', 'Loss of central pallor', 'Increased MCHC'],
+                'Sickle Cell': ['Sickled cells', 'Target cells', 'Howell-Jolly bodies'],
+                'AIHA': ['Spherocytes', 'Polychromasia', 'Agglutination (cold AIHA)'],
+                'Megaloblastic': ['Macro-ovalocytes', 'Hypersegmented neutrophils (>5 lobes)', 'Pancytopenia possible']
+            },
+            'Treatment': {
+                'G6PD': ['Avoid triggers (fava beans, sulfa drugs)', 'Supportive care', 'Transfusions if severe'],
+                'PK': ['Transfusions if severe', 'Splenectomy', 'Folic acid supplementation'],
+                'Methemoglobin': ['Methylene blue', 'Ascorbic acid', 'Remove offending agent'],
+                'IDA': ['Oral iron supplementation', 'IV iron if needed', 'Treat underlying cause'],
+                'Thalassemia': ['Transfusions (major)', 'Iron chelation', 'Usually none (minor)'],
+                'ACD': ['Treat underlying disease', 'EPO if CKD-related', 'Iron supplementation rarely helpful'],
+                'Sideroblastic': ['Pyridoxine (B6)', 'Remove toxin if acquired', 'Transfusions'],
+                'Aplastic': ['Bone marrow transplant', 'Immunosuppression (ATG/cyclosporine)', 'Supportive care'],
+                'Spherocytosis': ['Splenectomy', 'Folic acid', 'Vaccinations pre-splenectomy'],
+                'Sickle Cell': ['Hydroxyurea', 'Transfusions', 'Pain management', 'Voxelotor, crizanlizumab'],
+                'AIHA': ['Corticosteroids', 'Immunosuppression', 'Splenectomy', 'Rituximab'],
+                'Megaloblastic': ['B12 supplementation (IM if PA)', 'Folate supplementation', 'Treat underlying cause']
+            },
+            'Clinical Features': {
+                'G6PD': ['Episodic hemolysis', 'X-linked recessive', 'African, Mediterranean descent', 'Triggered by oxidative stress'],
+                'PK': ['Chronic hemolysis', 'Autosomal recessive', 'Variable severity', 'Neonatal jaundice common'],
+                'Methemoglobin': ['Cyanosis', 'Headache, fatigue', 'Can be congenital or acquired'],
+                'IDA': ['Fatigue, pallor', 'Koilonychia (spoon nails)', 'Pica, glossitis', 'Pagophagia'],
+                'Thalassemia': ['Ethnic predisposition', 'Hepatosplenomegaly (major)', 'Bone deformities (major)', 'Chipmunk facies'],
+                'ACD': ['Associated chronic illness', 'Inflammatory markers elevated', 'Malignancy or infection'],
+                'Sideroblastic': ['Can be acquired or congenital', 'Alcohol and lead exposure', 'Some respond to B6'],
+                'Aplastic': ['Pancytopenia symptoms', 'Infections, bleeding, fatigue', 'Drug/toxin exposure history'],
+                'Spherocytosis': ['Jaundice', 'Splenomegaly', 'Pigmented gallstones', 'Family history (AD)'],
+                'Sickle Cell': ['Vaso-occlusive crises', 'Acute chest syndrome', 'Autosplenectomy', 'Dactylitis in children'],
+                'AIHA': ['Can be warm or cold', 'Associated with lymphoma, SLE', 'Hemolysis symptoms'],
+                'Megaloblastic': ['Neurologic symptoms (B12)', 'Glossitis', 'Psychiatric changes', 'Hypersegmented neutrophils pathognomonic']
+            }
+        };
+
+        // Create word bank items organized by tabs
+        function createWordBank() {
+            const tabButtons = document.getElementById('tabButtons');
+            const tabContents = document.getElementById('tabContents');
+            
+            // Clear existing content
+            tabButtons.innerHTML = '';
+            tabContents.innerHTML = '';
+            
+            categories.forEach((category, index) => {
+                // Create tab button
+                const button = document.createElement('button');
+                button.className = 'tab-button' + (index === 0 ? ' active' : '');
+                button.textContent = category;
+                button.onclick = () => switchTab(index);
+                tabButtons.appendChild(button);
+                
+                // Create tab content
+                const content = document.createElement('div');
+                content.className = 'tab-content' + (index === 0 ? ' active' : '');
+                content.id = `tab-${index}`;
+                
+                const wordBank = document.createElement('div');
+                wordBank.className = 'word-bank';
+                
+                // Get all unique words for this category
+                const categoryWords = new Set();
+                Object.values(answers[category]).forEach(items => {
+                    items.forEach(item => categoryWords.add(item));
+                });
+                
+                const sortedWords = Array.from(categoryWords).sort();
+                
+                sortedWords.forEach(word => {
+                    const wordItem = document.createElement('div');
+                    wordItem.className = 'word-item';
+                    wordItem.draggable = true;
+                    wordItem.textContent = word;
+                    wordItem.dataset.word = word;
+                    wordItem.dataset.category = category;
+                    
+                    wordItem.addEventListener('dragstart', handleDragStart);
+                    wordItem.addEventListener('dragend', handleDragEnd);
+                    
+                    wordBank.appendChild(wordItem);
+                });
+                
+                content.appendChild(wordBank);
+                tabContents.appendChild(content);
+            });
+        }
+
+        function switchTab(index) {
+            // Update button states
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Update content visibility
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // Create game board
+        function createGameBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            
+            categories.forEach(category => {
+                const row = document.createElement('tr');
+                
+                const categoryCell = document.createElement('td');
+                categoryCell.className = 'category-cell';
+                categoryCell.textContent = category;
+                row.appendChild(categoryCell);
+                
+                diseases.forEach(disease => {
+                    const cell = document.createElement('td');
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.category = category;
+                    dropZone.dataset.disease = disease;
+                    
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+                    
+                    cell.appendChild(dropZone);
+                    row.appendChild(cell);
+                });
+                
+                gameBoard.appendChild(row);
+            });
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+            
+            const dropZone = e.currentTarget;
+            dropZone.classList.remove('drag-over');
+            
+            const word = draggedElement.dataset.word;
+            const wordCategory = draggedElement.dataset.category;
+            const category = dropZone.dataset.category;
+            const disease = dropZone.dataset.disease;
+            
+            // Create dropped item
+            const droppedItem = document.createElement('div');
+            droppedItem.className = 'dropped-item';
+            droppedItem.dataset.word = word;
+            droppedItem.dataset.category = category;
+            droppedItem.dataset.disease = disease;
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = word;
+            droppedItem.appendChild(textSpan);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = function() {
+                removeItem(droppedItem);
+            };
+            droppedItem.appendChild(removeBtn);
+            
+            dropZone.appendChild(droppedItem);
+            
+            // Only remove from word bank if NOT from MCV Classification category
+            if (wordCategory !== 'MCV Classification') {
+                draggedElement.remove();
+            }
+            
+            // Check this specific answer
+            checkSingleAnswer(droppedItem);
+            updateScore();
+            
+            return false;
+        }
+
+        function removeItem(item) {
+            const word = item.dataset.word;
+            const category = item.dataset.category;
+            
+            // Only add back to word bank if NOT from MCV Classification category
+            if (category !== 'MCV Classification') {
+                // Find the correct tab for this word based on the category it was placed in
+                const categoryIndex = categories.indexOf(category);
+                const targetTab = document.getElementById(`tab-${categoryIndex}`);
+                const wordBank = targetTab.querySelector('.word-bank');
+                
+                // Add back to word bank in the appropriate tab
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                wordItem.draggable = true;
+                wordItem.textContent = word;
+                wordItem.dataset.word = word;
+                wordItem.dataset.category = category;
+                
+                wordItem.addEventListener('dragstart', handleDragStart);
+                wordItem.addEventListener('dragend', handleDragEnd);
+                
+                // Insert in alphabetical order
+                const existingWords = Array.from(wordBank.children);
+                let inserted = false;
+                for (let i = 0; i < existingWords.length; i++) {
+                    if (word.localeCompare(existingWords[i].textContent) < 0) {
+                        wordBank.insertBefore(wordItem, existingWords[i]);
+                        inserted = true;
+                        break;
+                    }
+                }
+                if (!inserted) {
+                    wordBank.appendChild(wordItem);
+                }
+            }
+            
+            // Remove from drop zone
+            item.remove();
+            updateScore();
+        }
+
+        function checkSingleAnswer(item) {
+            const word = item.dataset.word;
+            const category = item.dataset.category;
+            const disease = item.dataset.disease;
+            
+            const correctAnswers = answers[category][disease];
+            
+            // Remove previous feedback classes
+            item.classList.remove('correct', 'incorrect');
+            
+            if (correctAnswers.includes(word)) {
+                item.classList.add('correct');
+            } else {
+                item.classList.add('incorrect');
+            }
+        }
+
+        function checkAnswers() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const items = zone.querySelectorAll('.dropped-item');
+                items.forEach(item => {
+                    checkSingleAnswer(item);
+                });
+            });
+            updateScore();
+        }
+
+        function updateScore() {
+            const allDroppedItems = document.querySelectorAll('.dropped-item');
+            let correct = 0;
+            let total = allDroppedItems.length;
+            
+            allDroppedItems.forEach(item => {
+                if (item.classList.contains('correct')) {
+                    correct++;
+                }
+            });
+            
+            document.getElementById('score').textContent = `Score: ${correct}/${total}`;
+            
+            if (total > 0) {
+                const percentage = (correct / total * 100).toFixed(0);
+                const feedback = document.getElementById('feedback');
+                
+                if (correct === total) {
+                    feedback.textContent = `🎉 Perfect! ${percentage}% Correct!`;
+                    feedback.className = 'feedback correct';
+                } else {
+                    feedback.textContent = `${percentage}% Correct - Keep going!`;
+                    feedback.className = 'feedback';
+                }
+            }
+        }
+
+        function resetGame() {
+            // Clear all drop zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.innerHTML = '';
+            });
+            
+            // Recreate word bank with tabs
+            createWordBank();
+            
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('score').textContent = 'Score: 0/0';
+        }
+
+        function revealAnswers() {
+            if (confirm('This will show all correct answers. Are you sure?')) {
+                resetGame();
+                
+                const dropZones = document.querySelectorAll('.drop-zone');
+                dropZones.forEach(zone => {
+                    const category = zone.dataset.category;
+                    const disease = zone.dataset.disease;
+                    const correctAnswers = answers[category][disease];
+                    
+                    correctAnswers.forEach(word => {
+                        const droppedItem = document.createElement('div');
+                        droppedItem.className = 'dropped-item correct';
+                        droppedItem.dataset.word = word;
+                        droppedItem.dataset.category = category;
+                        droppedItem.dataset.disease = disease;
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = word;
+                        droppedItem.appendChild(textSpan);
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-btn';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.onclick = function() {
+                            removeItem(droppedItem);
+                        };
+                        droppedItem.appendChild(removeBtn);
+                        
+                        zone.appendChild(droppedItem);
+                    });
+                });
+                
+                // Clear all word banks in all tabs
+                const allWordBanks = document.querySelectorAll('.word-bank');
+                allWordBanks.forEach(wb => wb.innerHTML = '');
+                
+                updateScore();
+                
+                document.getElementById('feedback').textContent = '📚 All answers revealed!';
+                document.getElementById('feedback').className = 'feedback correct';
+            }
+        }
+
+        // Initialize game
+        createWordBank();
+        createGameBoard();
+
+        // Prevent scroll propagation on word bank - must run after DOM is ready
+        setTimeout(function() {
+            const wordBankContainer = document.querySelector('.word-bank-container');
+            const tabButtons = document.querySelector('.tab-buttons');
+            
+            if (wordBankContainer) {
+                wordBankContainer.addEventListener('wheel', function(e) {
+                    // Find the active tab content
+                    const activeTabContent = wordBankContainer.querySelector('.tab-content.active');
+                    
+                    if (activeTabContent && activeTabContent.contains(e.target)) {
+                        // Check if we can scroll
+                        const canScrollDown = activeTabContent.scrollTop < (activeTabContent.scrollHeight - activeTabContent.clientHeight);
+                        const canScrollUp = activeTabContent.scrollTop > 0;
+                        const scrollingDown = e.deltaY > 0;
+                        const scrollingUp = e.deltaY < 0;
+                        
+                        // Only prevent default if we're actually scrolling within bounds
+                        if ((scrollingDown && canScrollDown) || (scrollingUp && canScrollUp)) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            activeTabContent.scrollTop += e.deltaY;
+                        }
+                    } else if (tabButtons && tabButtons.contains(e.target)) {
+                        // Prevent scroll on tab buttons area
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+        }, 100);
+    </script>
+</body>
+</html>
