@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MicroPharm &ndash; Drag &amp; Drop Games</title>
+<style>
+  :root{--bg:#0a0805;--surface:#14110b;--surface2:#1d1812;--text:#f1f5f9;--muted:#94a3b8;--border:rgba(255,255,255,0.07);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+  header{background:linear-gradient(160deg,#1a1305 0%,#2a1f08 50%,#0a0805 100%);border-bottom:1px solid var(--border);padding:44px 24px 36px;text-align:center;position:relative;overflow:hidden;}
+  header::after{content:'\1F52C';position:absolute;font-size:360px;opacity:.025;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+  header h1{font-size:2.4rem;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#f8fafc 30%,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;position:relative;}
+  header p{color:var(--muted);font-size:.9rem;position:relative;}
+  .pills{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;position:relative;}
+  .pill{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;color:var(--muted);}
+  .pill b{color:#10b981;}
+
+  .search-wrap{max-width:460px;margin:22px auto 0;position:relative;}
+  .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:10px 44px 10px 18px;color:var(--text);font-size:.85rem;outline:none;transition:.2s;}
+  .search-wrap input:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16, 185, 129, .18);}
+  .search-wrap input::placeholder{color:var(--muted);}
+  .search-ico{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none;}
+
+  main{max-width:1380px;margin:0 auto;padding:32px 16px 56px;}
+  .no-results{text-align:center;color:var(--muted);padding:60px 20px;font-size:.9rem;display:none;}
+
+  .week{margin-bottom:44px;}
+  .week-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 22px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(16, 185, 129, .16),rgba(16, 185, 129, .04));border:1px solid rgba(16, 185, 129, .28);}
+  .week-label{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;color:#10b981;}
+  .week-sub{font-size:.9rem;color:var(--text);opacity:.85;}
+  .week-count{margin-left:auto;font-size:.7rem;color:var(--muted);white-space:nowrap;}
+  @media (max-width:640px){.week-count{margin-left:0;flex-basis:100%;}}
+  .section{margin-bottom:32px;}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .section-icon{font-size:1.2rem;line-height:1;}
+  .section-title{font-size:.95rem;font-weight:700;color:var(--text);}
+  .section-badge{margin-left:auto;background:var(--surface2);border-radius:10px;padding:2px 8px;font-size:.68rem;color:var(--muted);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:7px;}
+  a.card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 12px;text-decoration:none;color:var(--text);display:flex;align-items:flex-start;gap:9px;transition:.15s;}
+  a.card:hover{border-color:var(--c,#10b981);background:var(--surface2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.5);}
+  .num{flex-shrink:0;background:var(--c,#10b981);color:#fff;border-radius:5px;padding:2px 5px;font-size:.6rem;font-weight:800;margin-top:1px;opacity:.9;letter-spacing:.3px;}
+  .ctitle{font-size:.75rem;line-height:1.45;color:var(--text);}
+</style>
+<script defer src="https://activetransport.app/static/tool-track.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>MicroPharm</h1>
+  <p>Drag &amp; Drop Study Games &nbsp;&middot;&nbsp; Antimicrobial Pharmacology</p>
+  <div class="pills">
+    <span class="pill"><b>71</b> games</span>
+    <span class="pill"><b>19</b> source bricks</span>
+    <span class="pill"><b>19</b> sections</span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search by topic or number&hellip;" autocomplete="off">
+    <span class="search-ico">&#x2315;</span>
+  </div>
+</header>
+
+<main>
+<div class="no-results" id="noResults">No games match your search.</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotics</span>
+    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
+    <span class="week-count">10 lectures &middot; 39 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🩸</span>
+    <span class="section-title">Principles of Antibacterial Drugs</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_01_mic_mbc_concepts.html" style="--c:#f59e0b"><span class="num">01</span><span class="ctitle">MIC, MBC, and Killing Power</span></a>
+    <a class="card" href="micro_02_pkpd_ratios.html" style="--c:#f59e0b"><span class="num">02</span><span class="ctitle">Three Ways to Beat the MIC</span></a>
+    <a class="card" href="micro_03_class_activity_pkpd.html" style="--c:#f59e0b"><span class="num">03</span><span class="ctitle">Class, Activity, and Parameter</span></a>
+    <a class="card" href="micro_04_empiric_to_definitive.html" style="--c:#f59e0b"><span class="num">04</span><span class="ctitle">From Best Guess to Best Choice</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🧬</span>
+    <span class="section-title">Cephalosporins</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_05_ceph_generations.html" style="--c:#10b981"><span class="num">05</span><span class="ctitle">Place the Cephalosporin</span></a>
+    <a class="card" href="micro_06_cell_wall_machinery.html" style="--c:#10b981"><span class="num">06</span><span class="ctitle">Cell-Wall Machinery</span></a>
+    <a class="card" href="micro_07_ceph_adverse_effects.html" style="--c:#10b981"><span class="num">07</span><span class="ctitle">Cephalosporin Hazards</span></a>
+    <a class="card" href="micro_08_generation_spectrum_trends.html" style="--c:#10b981"><span class="num">08</span><span class="ctitle">Five Generations, One Arrow</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">⚗️</span>
+    <span class="section-title">Carbapenems</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_09_beta_lactam_mechanism.html" style="--c:#8b5cf6"><span class="num">09</span><span class="ctitle">How Carbapenems Kill Bacteria</span></a>
+    <a class="card" href="micro_10_spectrum_and_niche.html" style="--c:#8b5cf6"><span class="num">10</span><span class="ctitle">Spectrum and Clinical Niche</span></a>
+    <a class="card" href="micro_11_imipenem_cilastatin_story.html" style="--c:#8b5cf6"><span class="num">11</span><span class="ctitle">The Imipenem-Cilastatin Story</span></a>
+    <a class="card" href="micro_12_adverse_effects_interactions.html" style="--c:#8b5cf6"><span class="num">12</span><span class="ctitle">Adverse Effects and Interactions</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🔬</span>
+    <span class="section-title">Vancomycin and Bacitracin</span>
+    <span class="section-badge">3 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_13_wall_assembly.html" style="--c:#06b6d4"><span class="num">13</span><span class="ctitle">Building the Bacterial Wall</span></a>
+    <a class="card" href="micro_14_pick_the_drug.html" style="--c:#06b6d4"><span class="num">14</span><span class="ctitle">Pick the Right Drug</span></a>
+    <a class="card" href="micro_15_vanc_toxicity_tracker.html" style="--c:#06b6d4"><span class="num">15</span><span class="ctitle">Vancomycin Toxicity Tracker</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🧪</span>
+    <span class="section-title">Penicillins</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_16_penicillin_classes.html" style="--c:#ec4899"><span class="num">16</span><span class="ctitle">Penicillin Subgroups</span></a>
+    <a class="card" href="micro_17_drug_pk_profiles.html" style="--c:#ec4899"><span class="num">17</span><span class="ctitle">Drug-by-Drug Pharmacokinetics</span></a>
+    <a class="card" href="micro_18_adverse_reactions.html" style="--c:#ec4899"><span class="num">18</span><span class="ctitle">Adverse Reactions to Penicillins</span></a>
+    <a class="card" href="micro_19_mechanism_and_resistance.html" style="--c:#ec4899"><span class="num">19</span><span class="ctitle">Kill Mechanisms vs Resistance Moves</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotic Spectrum & Coverage</span>
+    <span class="week-sub">Which drugs cover which bugs</span>
+    <span class="week-count">4 lectures &middot; 13 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">💊</span>
+    <span class="section-title">Spectrum of Activity and Indications 1 — Beta-Lactams and Vancomycin</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_20_penicillin_spectrum.html" style="--c:#84cc16"><span class="num">20</span><span class="ctitle">Penicillin Family: Who Covers What</span></a>
+    <a class="card" href="micro_21_cephalosporin_generations.html" style="--c:#84cc16"><span class="num">21</span><span class="ctitle">Cephalosporins by Generation</span></a>
+    <a class="card" href="micro_22_first_line_picks.html" style="--c:#84cc16"><span class="num">22</span><span class="ctitle">Pick the First-Line Agent</span></a>
+    <a class="card" href="micro_23_tough_bugs_coverage.html" style="--c:#84cc16"><span class="num">23</span><span class="ctitle">Tough Bugs and Coverage Gaps</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotics</span>
+    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
+    <span class="week-count">10 lectures &middot; 39 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🩺</span>
+    <span class="section-title">DNA Gyrase and Folic Acid Inhibitors — 2 of 2: Fluoroquinolones</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_24_fq_drug_lineup.html" style="--c:#f97316"><span class="num">24</span><span class="ctitle">The Fluoroquinolone Lineup</span></a>
+    <a class="card" href="micro_25_gyrase_topo_mechanism.html" style="--c:#f97316"><span class="num">25</span><span class="ctitle">Gyrase, Topo IV, and the FQ Kill Switch</span></a>
+    <a class="card" href="micro_26_fq_adverse_effects.html" style="--c:#f97316"><span class="num">26</span><span class="ctitle">FQ Adverse Effects by System</span></a>
+    <a class="card" href="micro_27_fq_resistance_interactions.html" style="--c:#f97316"><span class="num">27</span><span class="ctitle">Resistance and Drug Interactions</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotic Spectrum & Coverage</span>
+    <span class="week-sub">Which drugs cover which bugs</span>
+    <span class="week-count">4 lectures &middot; 13 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">⚡</span>
+    <span class="section-title">Spectrum of Activity and Indications 2 — Beta-Lactams and 30S Inhibitors</span>
+    <span class="section-badge">3 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_28_beta_lactam_gram_negative.html" style="--c:#3b82f6"><span class="num">28</span><span class="ctitle">Beta-Lactams Against the Gram-Negatives</span></a>
+    <a class="card" href="micro_29_spectrum_niches.html" style="--c:#3b82f6"><span class="num">29</span><span class="ctitle">Spectrum Niches: 30S Inhibitors and Friends</span></a>
+    <a class="card" href="micro_30_drug_to_indication.html" style="--c:#3b82f6"><span class="num">30</span><span class="ctitle">Right Drug, Right Infection</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotics</span>
+    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
+    <span class="week-count">10 lectures &middot; 39 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🩸</span>
+    <span class="section-title">Protein Synthesis Inhibitors — 1 of 2: Mechanisms of Action</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_31_ribosome_targets.html" style="--c:#f59e0b"><span class="num">31</span><span class="ctitle">Who Binds What on the Ribosome</span></a>
+    <a class="card" href="micro_32_drug_to_class.html" style="--c:#f59e0b"><span class="num">32</span><span class="ctitle">Name That PSI Class</span></a>
+    <a class="card" href="micro_33_resistance_mechanisms.html" style="--c:#f59e0b"><span class="num">33</span><span class="ctitle">How Bacteria Fight Back</span></a>
+    <a class="card" href="micro_34_psi_pharmacokinetics.html" style="--c:#f59e0b"><span class="num">34</span><span class="ctitle">PSI Pharmacokinetics</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🧬</span>
+    <span class="section-title">Protein Synthesis Inhibitors — 2 of 2: Adverse Drug Reactions</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_35_signature_toxicities.html" style="--c:#10b981"><span class="num">35</span><span class="ctitle">Signature Toxicities</span></a>
+    <a class="card" href="micro_36_drug_interactions.html" style="--c:#10b981"><span class="num">36</span><span class="ctitle">Dangerous Combinations</span></a>
+    <a class="card" href="micro_37_contraindications_populations.html" style="--c:#10b981"><span class="num">37</span><span class="ctitle">Who Should Not Get This Drug?</span></a>
+    <a class="card" href="micro_38_aminoglycoside_toxicity_profile.html" style="--c:#10b981"><span class="num">38</span><span class="ctitle">Anatomy of Aminoglycoside Toxicity</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotic Spectrum & Coverage</span>
+    <span class="week-sub">Which drugs cover which bugs</span>
+    <span class="week-count">4 lectures &middot; 13 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">⚗️</span>
+    <span class="section-title">Spectrum of Activity and Indications 3 — Fluoroquinolones and Sulfonamides</span>
+    <span class="section-badge">3 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_39_fq_smx_spectrum_profiles.html" style="--c:#8b5cf6"><span class="num">39</span><span class="ctitle">Fluoroquinolone and Sulfonamide Spectrum Profiles</span></a>
+    <a class="card" href="micro_40_regimen_coverage_summary.html" style="--c:#8b5cf6"><span class="num">40</span><span class="ctitle">Antibiotic Regimens and Their Coverage</span></a>
+    <a class="card" href="micro_41_cystitis_case_and_cautions.html" style="--c:#8b5cf6"><span class="num">41</span><span class="ctitle">Treating Acute Cystitis — Choices and Cautions</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotics</span>
+    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
+    <span class="week-count">10 lectures &middot; 39 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🔬</span>
+    <span class="section-title">DNA Gyrase Inhibitors and Folic Acid Synthesis Inhibitors — 1 of 2: Sulfonamides</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_42_drug_profiles.html" style="--c:#06b6d4"><span class="num">42</span><span class="ctitle">Sulfa Drugs and Their Folate-Blocking Partners</span></a>
+    <a class="card" href="micro_43_folate_pathway.html" style="--c:#06b6d4"><span class="num">43</span><span class="ctitle">The Bacterial Folate Pathway, Step by Step</span></a>
+    <a class="card" href="micro_44_adverse_reactions.html" style="--c:#06b6d4"><span class="num">44</span><span class="ctitle">Sulfonamide Adverse Reactions</span></a>
+    <a class="card" href="micro_45_therapy_and_resistance.html" style="--c:#06b6d4"><span class="num">45</span><span class="ctitle">Single Drugs, Combos, and Bacterial Defenses</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotic Spectrum & Coverage</span>
+    <span class="week-sub">Which drugs cover which bugs</span>
+    <span class="week-count">4 lectures &middot; 13 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🧪</span>
+    <span class="section-title">Spectrum of Activity and Indications 4 — 50S Inhibitors</span>
+    <span class="section-badge">3 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_46_fifty_s_spectra.html" style="--c:#ec4899"><span class="num">46</span><span class="ctitle">50S Inhibitor Spectra</span></a>
+    <a class="card" href="micro_47_fastidious_pathogen_treatment.html" style="--c:#ec4899"><span class="num">47</span><span class="ctitle">Treating Tick-Borne and Fastidious Infections</span></a>
+    <a class="card" href="micro_48_outpatient_cap_agents.html" style="--c:#ec4899"><span class="num">48</span><span class="ctitle">Choosing Agents for Outpatient CAP</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antibiotics</span>
+    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
+    <span class="week-count">10 lectures &middot; 39 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">💊</span>
+    <span class="section-title">Antibiotic Stewardship</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_49_resistance_mechanisms.html" style="--c:#84cc16"><span class="num">49</span><span class="ctitle">How Bacteria Become Resistant</span></a>
+    <a class="card" href="micro_50_enzymes_and_resistant_threats.html" style="--c:#84cc16"><span class="num">50</span><span class="ctitle">Resistance Enzymes and MDR Organisms</span></a>
+    <a class="card" href="micro_51_asp_interventions.html" style="--c:#84cc16"><span class="num">51</span><span class="ctitle">Antimicrobial Stewardship Program Interventions</span></a>
+    <a class="card" href="micro_52_therapy_strategy.html" style="--c:#84cc16"><span class="num">52</span><span class="ctitle">Choosing the Therapy Strategy</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antivirals</span>
+    <span class="week-sub">Herpes, HIV, influenza & RSV agents</span>
+    <span class="week-count">3 lectures &middot; 12 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🩺</span>
+    <span class="section-title">Antivirals 1 of 2: Drugs to Treat Herpesvirus Infections</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_53_mechanisms_and_targets.html" style="--c:#f97316"><span class="num">53</span><span class="ctitle">How Antiherpetic Drugs Work</span></a>
+    <a class="card" href="micro_54_prodrugs_and_routes.html" style="--c:#f97316"><span class="num">54</span><span class="ctitle">Prodrugs, Routes, and Roles</span></a>
+    <a class="card" href="micro_55_virus_to_treatment.html" style="--c:#f97316"><span class="num">55</span><span class="ctitle">Pick the Right Plan for the Virus</span></a>
+    <a class="card" href="micro_56_toxicities_and_interactions.html" style="--c:#f97316"><span class="num">56</span><span class="ctitle">Toxicities and Interactions</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">⚡</span>
+    <span class="section-title">Antiretrovirals — Drugs to Treat and Prevent HIV Infection</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_57_class_mechanisms.html" style="--c:#3b82f6"><span class="num">57</span><span class="ctitle">Antiretroviral Classes: Mechanisms</span></a>
+    <a class="card" href="micro_58_named_drugs.html" style="--c:#3b82f6"><span class="num">58</span><span class="ctitle">Name That Antiretroviral</span></a>
+    <a class="card" href="micro_59_adverse_effects.html" style="--c:#3b82f6"><span class="num">59</span><span class="ctitle">Antiretroviral Toxicities</span></a>
+    <a class="card" href="micro_60_prophylaxis_strategies.html" style="--c:#3b82f6"><span class="num">60</span><span class="ctitle">Preventing HIV and Its Complications</span></a>
+  </div>
+</section>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🩸</span>
+    <span class="section-title">Antivirals 2 of 2 — Drugs to Treat Influenza and RSV Infection</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_61_know_your_antiviral.html" style="--c:#f59e0b"><span class="num">61</span><span class="ctitle">Know Your Antiviral</span></a>
+    <a class="card" href="micro_62_toxicity_traceback.html" style="--c:#f59e0b"><span class="num">62</span><span class="ctitle">Toxicity Traceback</span></a>
+    <a class="card" href="micro_63_place_in_therapy.html" style="--c:#f59e0b"><span class="num">63</span><span class="ctitle">Who Gets What?</span></a>
+    <a class="card" href="micro_64_resistance_and_interactions.html" style="--c:#f59e0b"><span class="num">64</span><span class="ctitle">Resistance and Interactions</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antifungals</span>
+    <span class="week-sub">Drugs to treat fungal infections</span>
+    <span class="week-count">1 lectures &middot; 4 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">🧬</span>
+    <span class="section-title">Antifungals — Drugs to Treat Fungal Infections</span>
+    <span class="section-badge">4 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_65_target_and_mechanism.html" style="--c:#10b981"><span class="num">65</span><span class="ctitle">Antifungal Targets and Mechanisms</span></a>
+    <a class="card" href="micro_66_spectrum_bug_drug.html" style="--c:#10b981"><span class="num">66</span><span class="ctitle">Spectrum of Activity: Bug Meets Drug</span></a>
+    <a class="card" href="micro_67_adverse_reactions.html" style="--c:#10b981"><span class="num">67</span><span class="ctitle">Antifungal Adverse Drug Reactions</span></a>
+    <a class="card" href="micro_68_pk_and_interactions.html" style="--c:#10b981"><span class="num">68</span><span class="ctitle">Pharmacokinetics and Drug Interactions</span></a>
+  </div>
+</section>
+</div>
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Antiparasitics</span>
+    <span class="week-sub">Helminthic & protozoal agents</span>
+    <span class="week-count">1 lectures &middot; 3 games</span>
+  </div>
+
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">⚗️</span>
+    <span class="section-title">Agents Treating Helminthic and Protozoal Infections</span>
+    <span class="section-badge">3 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="micro_69_antiparasitic_mechanisms.html" style="--c:#8b5cf6"><span class="num">69</span><span class="ctitle">How Antiparasitics Kill</span></a>
+    <a class="card" href="micro_70_who_treats_whom.html" style="--c:#8b5cf6"><span class="num">70</span><span class="ctitle">Who Treats Whom</span></a>
+    <a class="card" href="micro_71_adverse_effects_counseling.html" style="--c:#8b5cf6"><span class="num">71</span><span class="ctitle">Adverse Effects and Counseling</span></a>
+  </div>
+</section>
+</div>
+
+
+<div class="week" data-week>
+  <div class="week-head">
+    <span class="week-label">Classic Games</span>
+    <span class="week-sub">The original standalone games</span>
+    <span class="week-count">9 games</span>
+  </div>
+<section class="section" data-section>
+  <div class="section-head">
+    <span class="section-icon">&#127918;</span>
+    <span class="section-title">Classics</span>
+    <span class="section-badge">9 games</span>
+  </div>
+  <div class="cards">
+    <a class="card" href="antifungal_classification.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Antifungal Drug Classification</span></a>
+    <a class="card" href="antibacterial_hierarchical.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Antibacterial Drug Classification</span></a>
+    <a class="card" href="antiviral_drugs_game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Antiviral Drug Classification</span></a>
+    <a class="card" href="antiparasitic_classification_game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Antiparasitic Drug Classification</span></a>
+    <a class="card" href="viral_pathogen_classification_game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Viral Pathogen Classification</span></a>
+    <a class="card" href="fungal-identification-game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Fungal Identification Challenge</span></a>
+    <a class="card" href="fungal_parasitic_classification_game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Fungal &amp; Parasitic Organisms</span></a>
+    <a class="card" href="helminth_classification_game.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Helminth Classification</span></a>
+    <a class="card" href="microbio_sim.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Hospital Hero: Microbiology Mastery</span></a>
+  </div>
+</section>
+</div>
+
+</main>
+
+<script>
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  let anyVisible = false;
+  document.querySelectorAll('.section').forEach(sec => {
+    let secVisible = false;
+    sec.querySelectorAll('.card').forEach(c => {
+      const match = c.textContent.toLowerCase().includes(q);
+      c.style.display = match ? '' : 'none';
+      if (match) secVisible = true;
+    });
+    sec.style.display = secVisible ? '' : 'none';
+    if (secVisible) anyVisible = true;
+  });
+  // A week heading with nothing left under it is just noise while searching.
+  document.querySelectorAll('.week').forEach(wk => {
+    const has = Array.from(wk.querySelectorAll('.section'))
+      .some(s => s.style.display !== 'none');
+    wk.style.display = has ? '' : 'none';
+  });
+  document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
+});
+</script>
+</body>
+</html>
