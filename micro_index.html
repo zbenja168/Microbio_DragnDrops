@@ -43,6 +43,11 @@
   a.card:hover{border-color:var(--c,#10b981);background:var(--surface2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.5);}
   .num{flex-shrink:0;background:var(--c,#10b981);color:#fff;border-radius:5px;padding:2px 5px;font-size:.6rem;font-weight:800;margin-top:1px;opacity:.9;letter-spacing:.3px;}
   .ctitle{font-size:.75rem;line-height:1.45;color:var(--text);}
+  .week{margin-bottom:44px;}
+  .week-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(16,185,129,.04));border:1px solid rgba(16,185,129,.28);}
+  .week-label{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;color:#10b981;}
+  .week-count{margin-left:auto;font-size:.7rem;color:var(--muted);white-space:nowrap;}
+  .sess-head{margin:6px 0 12px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
 </style>
 <script defer src="https://activetransport.app/static/tool-track.js"></script>
 </head>
@@ -67,11 +72,11 @@
 
 <div class="week" data-week>
   <div class="week-head">
-    <span class="week-label">Antibiotics</span>
-    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
-    <span class="week-count">10 lectures &middot; 39 games</span>
+    <span class="week-label">Week 1</span>
+    <span class="week-count">5 lectures &middot; 19 games</span>
   </div>
 
+<div class="sess-head" data-sess>Session 1</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🩸</span>
@@ -86,6 +91,7 @@
   </div>
 </section>
 
+<div class="sess-head" data-sess>Session 2</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🧬</span>
@@ -140,15 +146,16 @@
     <a class="card" href="micro_19_mechanism_and_resistance.html" style="--c:#ec4899"><span class="num">19</span><span class="ctitle">Kill Mechanisms vs Resistance Moves</span></a>
   </div>
 </section>
+
 </div>
 
 <div class="week" data-week>
   <div class="week-head">
-    <span class="week-label">Antibiotic Spectrum & Coverage</span>
-    <span class="week-sub">Which drugs cover which bugs</span>
-    <span class="week-count">4 lectures &middot; 13 games</span>
+    <span class="week-label">Week 2</span>
+    <span class="week-count">9 lectures &middot; 33 games</span>
   </div>
 
+<div class="sess-head" data-sess>Session 1</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">💊</span>
@@ -162,14 +169,6 @@
     <a class="card" href="micro_23_tough_bugs_coverage.html" style="--c:#84cc16"><span class="num">23</span><span class="ctitle">Tough Bugs and Coverage Gaps</span></a>
   </div>
 </section>
-</div>
-
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotics</span>
-    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
-    <span class="week-count">10 lectures &middot; 39 games</span>
-  </div>
 
 <section class="section" data-section>
   <div class="section-head">
@@ -184,15 +183,8 @@
     <a class="card" href="micro_27_fq_resistance_interactions.html" style="--c:#f97316"><span class="num">27</span><span class="ctitle">Resistance and Drug Interactions</span></a>
   </div>
 </section>
-</div>
 
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotic Spectrum & Coverage</span>
-    <span class="week-sub">Which drugs cover which bugs</span>
-    <span class="week-count">4 lectures &middot; 13 games</span>
-  </div>
-
+<div class="sess-head" data-sess>Session 2</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">⚡</span>
@@ -205,14 +197,6 @@
     <a class="card" href="micro_30_drug_to_indication.html" style="--c:#3b82f6"><span class="num">30</span><span class="ctitle">Right Drug, Right Infection</span></a>
   </div>
 </section>
-</div>
-
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotics</span>
-    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
-    <span class="week-count">10 lectures &middot; 39 games</span>
-  </div>
 
 <section class="section" data-section>
   <div class="section-head">
@@ -241,15 +225,8 @@
     <a class="card" href="micro_38_aminoglycoside_toxicity_profile.html" style="--c:#10b981"><span class="num">38</span><span class="ctitle">Anatomy of Aminoglycoside Toxicity</span></a>
   </div>
 </section>
-</div>
 
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotic Spectrum & Coverage</span>
-    <span class="week-sub">Which drugs cover which bugs</span>
-    <span class="week-count">4 lectures &middot; 13 games</span>
-  </div>
-
+<div class="sess-head" data-sess>Session 3</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">⚗️</span>
@@ -262,14 +239,6 @@
     <a class="card" href="micro_41_cystitis_case_and_cautions.html" style="--c:#8b5cf6"><span class="num">41</span><span class="ctitle">Treating Acute Cystitis — Choices and Cautions</span></a>
   </div>
 </section>
-</div>
-
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotics</span>
-    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
-    <span class="week-count">10 lectures &middot; 39 games</span>
-  </div>
 
 <section class="section" data-section>
   <div class="section-head">
@@ -284,15 +253,8 @@
     <a class="card" href="micro_45_therapy_and_resistance.html" style="--c:#06b6d4"><span class="num">45</span><span class="ctitle">Single Drugs, Combos, and Bacterial Defenses</span></a>
   </div>
 </section>
-</div>
 
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotic Spectrum & Coverage</span>
-    <span class="week-sub">Which drugs cover which bugs</span>
-    <span class="week-count">4 lectures &middot; 13 games</span>
-  </div>
-
+<div class="sess-head" data-sess>Session 4</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🧪</span>
@@ -305,14 +267,6 @@
     <a class="card" href="micro_48_outpatient_cap_agents.html" style="--c:#ec4899"><span class="num">48</span><span class="ctitle">Choosing Agents for Outpatient CAP</span></a>
   </div>
 </section>
-</div>
-
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antibiotics</span>
-    <span class="week-sub">Cell wall, protein synthesis, DNA & folate agents</span>
-    <span class="week-count">10 lectures &middot; 39 games</span>
-  </div>
 
 <section class="section" data-section>
   <div class="section-head">
@@ -327,15 +281,16 @@
     <a class="card" href="micro_52_therapy_strategy.html" style="--c:#84cc16"><span class="num">52</span><span class="ctitle">Choosing the Therapy Strategy</span></a>
   </div>
 </section>
+
 </div>
 
 <div class="week" data-week>
   <div class="week-head">
-    <span class="week-label">Antivirals</span>
-    <span class="week-sub">Herpes, HIV, influenza & RSV agents</span>
+    <span class="week-label">Week 3</span>
     <span class="week-count">3 lectures &middot; 12 games</span>
   </div>
 
+<div class="sess-head" data-sess>Session 1</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🩺</span>
@@ -350,6 +305,7 @@
   </div>
 </section>
 
+<div class="sess-head" data-sess>Session 2</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">⚡</span>
@@ -364,6 +320,7 @@
   </div>
 </section>
 
+<div class="sess-head" data-sess>Session 3</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🩸</span>
@@ -377,15 +334,16 @@
     <a class="card" href="micro_64_resistance_and_interactions.html" style="--c:#f59e0b"><span class="num">64</span><span class="ctitle">Resistance and Interactions</span></a>
   </div>
 </section>
+
 </div>
 
 <div class="week" data-week>
   <div class="week-head">
-    <span class="week-label">Antifungals</span>
-    <span class="week-sub">Drugs to treat fungal infections</span>
-    <span class="week-count">1 lectures &middot; 4 games</span>
+    <span class="week-label">Week 4</span>
+    <span class="week-count">2 lectures &middot; 7 games</span>
   </div>
 
+<div class="sess-head" data-sess>Session 1</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">🧬</span>
@@ -399,15 +357,8 @@
     <a class="card" href="micro_68_pk_and_interactions.html" style="--c:#10b981"><span class="num">68</span><span class="ctitle">Pharmacokinetics and Drug Interactions</span></a>
   </div>
 </section>
-</div>
 
-<div class="week" data-week>
-  <div class="week-head">
-    <span class="week-label">Antiparasitics</span>
-    <span class="week-sub">Helminthic & protozoal agents</span>
-    <span class="week-count">1 lectures &middot; 3 games</span>
-  </div>
-
+<div class="sess-head" data-sess>Session 2</div>
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">⚗️</span>
@@ -420,15 +371,15 @@
     <a class="card" href="micro_71_adverse_effects_counseling.html" style="--c:#8b5cf6"><span class="num">71</span><span class="ctitle">Adverse Effects and Counseling</span></a>
   </div>
 </section>
-</div>
 
+</div>
 
 <div class="week" data-week>
   <div class="week-head">
-    <span class="week-label">Classic Games</span>
-    <span class="week-sub">The original standalone games</span>
-    <span class="week-count">9 games</span>
+    <span class="week-label">Review & Synthesis</span>
+    <span class="week-count">1 lecture &middot; 9 games</span>
   </div>
+
 <section class="section" data-section>
   <div class="section-head">
     <span class="section-icon">&#127918;</span>
@@ -447,7 +398,10 @@
     <a class="card" href="microbio_sim.html" style="--c:#64748b"><span class="num">&#9733;</span><span class="ctitle">Hospital Hero: Microbiology Mastery</span></a>
   </div>
 </section>
+
 </div>
+
+
 
 </main>
 
@@ -473,6 +427,29 @@ document.getElementById('search').addEventListener('input', function() {
   });
   document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
 });
+</script>
+<script>
+// Week / Session headers (class schedule): hide any header whose sections are
+// all filtered out by the search box. Registered after the search handler.
+(function () {
+  var box = document.getElementById('search');
+  if (!box) return;
+  function vis(el) { return el.style.display !== 'none'; }
+  box.addEventListener('input', function () {
+    document.querySelectorAll('[data-sess]').forEach(function (h) {
+      var n = h.nextElementSibling, any = false;
+      while (n && !n.hasAttribute('data-sess')) {
+        if (n.hasAttribute('data-section') && vis(n)) { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      h.style.display = any ? '' : 'none';
+    });
+    document.querySelectorAll('[data-week]').forEach(function (w) {
+      var any = Array.prototype.some.call(w.querySelectorAll('[data-section]'), vis);
+      w.style.display = any ? '' : 'none';
+    });
+  });
+})();
 </script>
 </body>
 </html>
